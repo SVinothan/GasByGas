@@ -11,19 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cities', function (Blueprint $table) {
+        Schema::create('employees', function (Blueprint $table) {
             $table->id();
             $table->integer('province_id')->nullable();
             $table->integer('district_id')->nullable();
-            $table->string('name_en')->nullable();
-            $table->string('name_si')->nullable();
-            $table->string('name_ta')->nullable();
-            $table->string('sub_name_en')->nullable();
-            $table->string('sub_name_si')->nullable();
-            $table->string('sub_name_ta')->nullable();
-            $table->string('postcode')->nullable();
-            $table->double('latitude')->nullable();
-            $table->double('longitude')->nullable();
+            $table->integer('city_id')->nullable();
+            $table->integer('outlet_id')->nullable();
+            $table->string('full_name')->nullable();
+            $table->ttext('address')->nullable();
+            $table->string('email')->nullable();
+            $table->integer('mobile_no')->nullable();
+            $table->string('nic_no')->nullable();
+            $table->integer('role_id')->nullable();
             $table->integer('user_id')->nullable();
             $table->timestamps();
             $table->softDeletes();
@@ -35,6 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('cities');
+        Schema::dropIfExists('employees');
     }
 };
