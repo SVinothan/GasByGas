@@ -12,4 +12,8 @@ class District extends Model
 
     protected $guarded = [];
 
+    public function districtProvince()
+    {
+        return $this->belongsTo(Province::class,'province_id');
+    }
 }
