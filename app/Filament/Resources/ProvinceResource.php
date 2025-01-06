@@ -53,7 +53,7 @@ class ProvinceResource extends Resource
                                 ])
                                 ->schema([
                             Forms\Components\TextInput::make('name_en')->regex('/^[a-zA-Z\s]+$/u')->label('Province Name')
-                                ->maxLength(191)->unique(table: Branch::class, ignoreRecord:true),
+                                ->maxLength(191)->unique(table: Branch::class, ignoreRecord:true)->rules(['required']),
                                 ])
                             ])
                     ])
@@ -70,7 +70,19 @@ class ProvinceResource extends Resource
                             ->send();
                     })
                     ->modalWidth(MaxWidth::Small),
-                Tables\Actions\DeleteAction::make()->label('')->toolTip('Delete Province'),
+                Tables\Actions\DeleteAction::make()->label('')->toolTip('Delete Province')
+                    ->action(function (District $record)
+                    {
+                        District::where('province_id',$record->id)->delete();
+                        City::where('province_id',$record->id)->delete();
+                        $record->delete();
+
+                        Notification::make()
+                            ->success()
+                            ->title('Succcess')
+                            ->body('The Province has been deleted successfully.')
+                            ->send();
+                    }),
             ])
             ->bulkActions([
                 // Tables\Actions\BulkActionGroup::make([

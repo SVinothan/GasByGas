@@ -31,7 +31,7 @@ class ListProvinces extends ListRecords
                             ])
                             ->schema([
                             Forms\Components\TextInput::make('name_en')->regex('/^[a-zA-Z\s]+$/u')->label('Province Name')
-                                ->maxLength(191)->unique(table: Branch::class, ignoreRecord:true),
+                                ->maxLength(191)->unique(table: Branch::class, ignoreRecord:true)->rules(['required']),
                             ])
                         ])
                 ])
