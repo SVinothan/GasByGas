@@ -17,7 +17,7 @@ return new class extends Migration
             $table->integer('district_id')->nullable();
             $table->integer('city_id')->nullable();
             $table->string('full_name')->nullable();
-            $table->ttext('address')->nullable();
+            $table->text('address')->nullable();
             $table->string('email')->nullable();
             $table->integer('mobile_no')->nullable();
             $table->string('nic_no')->nullable();
