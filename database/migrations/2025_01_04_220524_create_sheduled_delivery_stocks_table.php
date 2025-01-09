@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('city_id')->nullable();
             $table->integer('outlet_id')->nullable();
             $table->integer('qty')->nullable();
-            $table->integer('cylinder_type_id')->nullable();
+            $table->integer('item_id')->nullable();
             $table->date('sheduled_date')->nullable();
             $table->string('status')->nullable();
             $table->string('batch_no')->nullable();

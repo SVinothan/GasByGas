@@ -19,7 +19,7 @@ return new class extends Migration
             $table->integer('outlet_id')->nullable();
             $table->integer('customer_id')->nullable();
             $table->integer('customer_order_id')->nullable();
-            $table->integer('no_of_cylinder')->nullable();
+            $table->integer('qty')->nullable();
             $table->string('status')->nullable();
             $table->string('token_no')->nullable();
             $table->date('order_date')->nullable();

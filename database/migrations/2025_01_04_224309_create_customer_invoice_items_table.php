@@ -21,8 +21,9 @@ return new class extends Migration
             $table->integer('customer_order_id')->nullable();
             $table->integer('customer_invoice_id')->nullable();
             $table->integer('order_date')->nullable();
-            $table->integer('no_of_cylinder')->nullable();
-            $table->integer('cylinder_type_id')->nullable();
+            $table->integer('item_id')->nullable();
+            $table->integer('stock_id')->nullable();
+            $table->integer('qty')->nullable();
             $table->decimal('amount',13,2)->default('0.00');
             $table->decimal('total',13,2)->default('0.00');
             $table->integer('user_id')->nullable();

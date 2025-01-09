@@ -19,7 +19,7 @@ return new class extends Migration
             $table->integer('outlet_id')->nullable();
             $table->integer('sheduled_delivery_id')->nullable();
             $table->integer('qty')->nullable();
-            $table->integer('cylinder_type_id')->nullable();
+            $table->integer('item_id')->nullable();
             $table->date('stock_date')->nullable();
             $table->string('batch_no')->nullable();
             $table->decimal('cost_price',13,2)->default('0.00');
