@@ -28,18 +28,20 @@ class DatabaseSeeder extends Seeder
             'role' => 'SuperAdmin', 
         ]);
 
-        DB::table('roles')->insert([
-            'name' => 'SuperAdmin',
-            'guard_name' => 'web',
-        ]);
+        // DB::table('roles')->insert([
+        //     'name' => 'SuperAdmin',
+        //     'guard_name' => 'web',
+        // ]);
 
        
-        $user=User::find(1);
-        $user->assignRole('SuperAdmin');
-
+       
         $this->call(CitiesTableSeeder::class);
         $this->call(DistrictsTableSeeder::class);
         $this->call(ProvincesTableSeeder::class);
+        $this->call(RoleSeeder::class);
+
+        $user=User::find(1);
+        $user->assignRole('SuperAdmin');
 
     }
 }
