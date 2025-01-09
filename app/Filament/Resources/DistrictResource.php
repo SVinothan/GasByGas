@@ -36,9 +36,9 @@ class DistrictResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('districtProvince.name_en')
-                    ->searchable()->label('Province'),
+                    ->searchable()->label('Province Name'),
                 Tables\Columns\TextColumn::make('name_en')
-                    ->searchable(),
+                    ->searchable()->label('District Name'),
             ])
             ->filters([
                 // Tables\Filters\TrashedFilter::make(),

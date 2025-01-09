@@ -35,7 +35,7 @@ class ProvinceResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name_en')
-                    ->searchable(),
+                    ->searchable()->label('Province Name'),
             ])
             ->filters([
                 // Tables\Filters\TrashedFilter::make(),
