@@ -12,4 +12,18 @@ class Outlet extends Model
 
     protected $guarded = [];
 
+    public function outletProvince()
+    {
+        return $this->belongsTo(Province::class,'province_id');
+    }
+
+    public function outletDistrict()
+    {
+        return $this->belongsTo(District::class,'district_id');
+    }
+
+    public function outletCity()
+    {
+        return $this->belongsTo(City::class,'city_id');
+    }
 }
