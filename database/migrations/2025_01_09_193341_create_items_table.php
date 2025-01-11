@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('items', function (Blueprint $table) {
             $table->id();
-            $table->integer('name')->nullable();
+            $table->string('name')->nullable();
             $table->decimal('height_in_meter')->default('0.00');
             $table->decimal('weight_in_kg')->default('0.00');
             $table->decimal('capacity')->default('0.00');
