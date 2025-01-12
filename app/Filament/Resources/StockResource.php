@@ -18,6 +18,7 @@ class StockResource extends Resource
     protected static ?string $model = Stock::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'Item';
 
     public static function form(Form $form): Form
     {

@@ -11,4 +11,23 @@ class CustomerOrderItem extends Model
 
     protected $guarded = [];
 
+    public function customerOrderItemCity()
+    {
+        return $this->belongsTo(City::class,'city_id');
+    }
+
+    public function customerOrderItemOutlet()
+    {
+        return $this->belongsTo(Outlet::class,'outlet_id');
+    }
+
+    public function customerOrderItemCustomer()
+    {
+        return $this->belongsTo(Customer::class,'customer_id');
+    }
+
+    public function customerOrderItemDetail()
+    {
+        return $this->belongsTo(Item::class,'item_id');
+    }
 }

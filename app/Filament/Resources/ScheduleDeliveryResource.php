@@ -26,7 +26,8 @@ class ScheduleDeliveryResource extends Resource
 {
     protected static ?string $model = ScheduleDelivery::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-calendar-days';
+    protected static ?string $navigationGroup = 'Item';
 
     public static function form(Form $form): Form
     {
