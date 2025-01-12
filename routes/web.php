@@ -15,8 +15,8 @@ use Illuminate\Support\Facades\Artisan;
 */
 
 Route::get('/', function () {
-    // return view('welcome');
-   return redirect()->route('filament.admin.auth.login');
+    return view('public_pages.index');
+//    return redirect()->route('filament.admin.auth.login');
    
 });
 
