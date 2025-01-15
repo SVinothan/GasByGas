@@ -18,7 +18,7 @@ Route::get('/', function () {
     return view('public_pages.index');
 //    return redirect()->route('filament.admin.auth.login');
    
-});
+})->name('index');
 
 Route::get('clear-cache',function(){
     $run = Artisan::call('cache:clear');
