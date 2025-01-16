@@ -19,6 +19,8 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Filament\Navigation\MenuItem;
 use App\Filament\Pages\Profile\UpdateProfileDetail;
+use App\Filament\Pages\Profile\Registration;
+
 class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
@@ -28,6 +30,8 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->registration(Registration::class)
+            // ->passwordReset()
             ->colors([
                 'primary' => '#026ec5',
             ])

@@ -130,7 +130,7 @@
                             <nav class="navbar navbar-expand-md p-0" id="menu">
                                 <div class="right">
                                     <ul id="menu-main-menu" class="menu navbar-nav mr-auto">
-                                        <li id="menu-item-1155" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-1155 nav-item"><a href="{{route('filament.admin.auth.login')}}">Register</a>
+                                        <li id="menu-item-1155" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-1155 nav-item"><a href="{{route('filament.admin.auth.register')}}">Register</a>
                                         {{-- <ul class="sub-menu">
                                             <li id="menu-item-97" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-97 nav-item"><a href="../../press/index.html">Press</a></li>
                                             <li id="menu-item-1244" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-1244 nav-item"><a href="../../category/event/index.html">Events</a></li>
@@ -168,7 +168,7 @@
                     </div>
                     <div class="mobile-menu" id="navbarCollapse">
                         <ul id="menu-main-menu-1" class="menu navbar-nav mr-auto">
-                            <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-1155 nav-item"><a href="#">Register</a>
+                            <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-has-children menu-item-1155 nav-item"><a href="{{route('filament.admin.auth.register')}}">Register</a>
                             {{-- <ul class="sub-menu">
                                 <li class="menu-item menu-item-type-post_type menu-item-object-page menu-item-97 nav-item"><a href="../../press/index.html">Press<span></span></a></li>
                                 <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-1244 nav-item"><a href="../../category/event/index.html">Events<span></span></a></li>
