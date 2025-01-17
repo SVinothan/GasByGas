@@ -44,7 +44,7 @@ class Registration extends BaseRegister
         return $form
             ->schema([
                 Forms\Components\Wizard::make([
-                    Forms\Components\Wizard\Step::make('Person')
+                    Forms\Components\Wizard\Step::make('Personal')
                         ->schema([
                         Forms\Components\Select::make('province_id')->label('Select Province')
                             ->options(Province::pluck('name_en','id'))->rules(['required'])->searchable(),
@@ -60,11 +60,16 @@ class Registration extends BaseRegister
                     ]),
                     Forms\Components\Wizard\Step::make('Detail')
                         ->schema([
+                        Forms\Components\TextInput::make('email')->rules(['required'])->email()
+                            ->unique(table: Customer::class, ignoreRecord:true),
+                        Forms\Components\TextInput::make('mobile_no')->rules(['required'])->minLength(9)->maxLength(10)
+                            ->unique(table: Customer::class, ignoreRecord:true)->label('Mobile Number'),
+                        Forms\Components\Textarea::make('address'),
                         Forms\Components\Select::make('type')->label('Select Type')
                             ->options([
                                 'Individual' => 'Individual',
                                 'Industry' => 'Industry',
-                            ])->live()->rules(['required']),
+                            ])->live()->rules(['required'])->native(false),
                         Forms\Components\TextInput::make('bussiness_name')
                             ->rules(['required'])->hidden(fn(Get $get):bool=>$get('type') == 'Industry' ? false : true),
                         Forms\Components\TextInput::make('bussiness_reg_no')->label('Registration Number')
@@ -81,17 +86,17 @@ class Registration extends BaseRegister
                                 '4:3',
                                 '1:1',
                             ]),
-                        Forms\Components\Textarea::make('address'),
+                        
                     ]),
-                    Forms\Components\Wizard\Step::make('Auth')
-                        ->schema([
-                            Forms\Components\TextInput::make('email')->rules(['required'])->email()
-                                ->unique(table: Customer::class, ignoreRecord:true),
-                            Forms\Components\TextInput::make('mobile_no')->rules(['required'])->minLength(9)->maxLength(10)
-                                ->unique(table: Customer::class, ignoreRecord:true)->label('Mobile Number'),
-                            $this->getPasswordFormComponent(),
-                            $this->getPasswordConfirmationFormComponent(),
-                    ])
+                    // Forms\Components\Wizard\Step::make('Auth')
+                    //     ->schema([
+                    //         Forms\Components\TextInput::make('email')->rules(['required'])->email()
+                    //             ->unique(table: Customer::class, ignoreRecord:true),
+                    //         Forms\Components\TextInput::make('mobile_no')->rules(['required'])->minLength(9)->maxLength(10)
+                    //             ->unique(table: Customer::class, ignoreRecord:true)->label('Mobile Number'),
+                    //         // $this->getPasswordFormComponent(),
+                    //         // $this->getPasswordConfirmationFormComponent(),
+                    // ])
             ])->submitAction(new HtmlString(Blade::render(<<<BLADE
             <x-filament::button
                 type="submit"

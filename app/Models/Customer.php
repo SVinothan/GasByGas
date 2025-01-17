@@ -12,4 +12,19 @@ class Customer extends Model
 
     protected $guarded = [];
 
+    public function customerProvince()
+    {
+        return $this->belongsTo(Province::class,'province_id');
+    }
+
+    public function customerDistrict()
+    {
+        return $this->belongsTo(District::class,'district_id');
+    }
+
+    public function customerCity()
+    {
+        return $this->belongsTo(City::class,'city_id');
+    }
+
 }
