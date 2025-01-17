@@ -43,9 +43,10 @@ class CustomerOrderResource extends Resource
                         'lg' => 2,
                     ])
                     ->schema([
-                        Forms\Components\Select::make('outlet_id')
-                            // ->options(Outlet::where('city_id',auth()->user()->userCustomer->city_id)->pluck('outlet_name','id')),
-                            ->options(Outlet::pluck('outlet_name','id'))->rules(['required']),
+                        Forms\Components\Select::make('outlet_id')->label('Select Outlet')->searchable()
+                            ->options(Outlet::where('city_id',auth()->user()->userCustomer->city_id)->pluck('outlet_name','id'))
+                           ,
+                            // ->options(Outlet::pluck('outlet_name','id'))->rules(['required']),
                         Forms\Components\DatePicker::make('order_date')->readOnly()->default(now()),
                     ])
 
@@ -74,26 +75,63 @@ class CustomerOrderResource extends Resource
                                 ])
                                 ->afterStateUpdated(function (Get $get,Set $set)
                                 {
-                                    $stock = Stock::where('item_id',$get('item_id'))->where('outlet_id',$get('outlet_id'))->sum('qty');
-                                    $stockOrderedQty = CustomerOrderItem::where('item_id',$get('item_id'))->where('outlet_id',$get('outlet_id'))->where('shedule_delivery_id',null)->sum('qty');
+
+                                    // dd($get('../../outlet_id'));
+                                    $stock = Stock::where('item_id',$get('item_id'))->where('outlet_id',$get('../../outlet_id'))->sum('qty');
+                                    $stockOrderedQty = CustomerOrderItem::where('item_id',$get('item_id'))->where('outlet_id',$get('../../outlet_id'))->where('schedule_delivery_id',null)->sum('qty');
                                     if ($get('qty') > '0.00' )
                                     {
+                                        if($get('qty') > auth()->user()->userCustomer->cylinder_limit)
+                                        {
+                                            Notification::make()
+                                                ->warning()
+                                                ->title('Warning!!')
+                                                ->body('You are exceeding your cylinder limit. Please check the quantity.')
+                                                ->send();
+                                            $set('item_id',null);
+                                            $set('qty',null);
+                                            $set('sales_price',null);
+                                            $set('total',null);
+                                            $set('schedule_delivery_id',null);
+                                            return;
+                                        }
+
                                         if($get('qty') + $stockOrderedQty > $stock)
                                         {
-                                            $scheduledStock = ScheduleDeliveryStock::where('item_id',$get('item_id'))->where('outlet_id',$get('outlet_id'))->whereIn('status',['Scheduled','Confirmed'])->where('scheduled_date','<',Carbon::now()->addDays(14)->format('Y-m-d'))->get();
-                                            if($scheduledStock != null)
+                                            $scheduledStock = ScheduleDeliveryStock::where('item_id',$get('item_id'))->where('outlet_id',$get('../../outlet_id'))->whereIn('status',['Scheduled','Confirmed'])->where('scheduled_date','<',Carbon::now()->addDays(14)->format('Y-m-d'))->get();
+                                            // dd($scheduledStock->count());
+                                            
+                                            if($scheduledStock->count() > 0)
                                             {
                                                 foreach ($scheduledStock as $schedule) 
                                                 {
-                                                    $scheduleOrderedQty = CustomerOrderItem::where('item_id',$get('item_id'))->where('outlet_id',$get('outlet_id'))->where('shedule_delivery_id',$schedule->schedule_delivery_id)->sum('qty');
+                                                    $scheduleOrderedQty = CustomerOrderItem::where('item_id',$get('item_id'))->where('outlet_id',$get('../../outlet_id'))->where('schedule_delivery_id',$schedule->schedule_delivery_id)->sum('qty');
                                                     if($scheduleOrderedQty + $get('qty') <= $schedule->qty)
                                                     {
-                                                        $set('sales_price',$schedule->amount);
-                                                        $set('total',$schedule->amount * $get('qty'));
-                                                        $set('shedule_delivery_id',$schedule->shedule_delivery_id);
+                                                        $set('sales_price',$schedule->sales_price);
+                                                        $set('total',$schedule->sales_price * $get('qty'));
+                                                        $set('schedule_delivery_id',$schedule->schedule_delivery_id);
                                                         break;
                                                     }
                                                 }
+                                                if($get('schedule_delivery_id') == null)
+                                                {
+                                                    Notification::make()
+                                                        ->warning()
+                                                        ->title('Warning!!')
+                                                        ->body('There are no stock availabe. Try again later Or contact outlet manager.')
+                                                        ->send();
+                                                    $set('item_id',null);
+                                                    $set('qty',null);
+                                                    $set('sales_price',null);
+                                                    $set('total',null);
+                                                    $set('schedule_delivery_id',null);
+                                                    return;
+                                                }
+                                                
+                                            }
+                                            else
+                                            {
                                                 Notification::make()
                                                     ->warning()
                                                     ->title('Warning!!')
@@ -101,22 +139,17 @@ class CustomerOrderResource extends Resource
                                                     ->send();
                                                 $set('item_id',null);
                                                 $set('qty',null);
+                                                $set('sales_price',null);
+                                                $set('total',null);
+                                                $set('schedule_delivery_id',null);
                                                 return;
                                             }
-                                            Notification::make()
-                                                ->warning()
-                                                ->title('Warning!!')
-                                                ->body('There are no stock availabe. Try again later Or contact outlet manager.')
-                                                ->send();
-                                            $set('item_id',null);
-                                            $set('qty',null);
-                                            return;
-                                            // $scheduledStock->sum('qty') < $get('qty') + CustomerOrderStock::where('item_id',$get('item_id'))->where('outlet_id',$get('outlet_id'))
+                                            // $scheduledStock->sum('qty') < $get('qty') + CustomerOrderStock::where('item_id',$get('item_id'))->where('outlet_id',$get('../../outlet_id'))
                                         }
                                         else
                                         {
-                                            $latestStock = Stock::where('item_id',$get('item_id'))->where('outlet_id',$get('outlet_id'))->latest('id')->first();
-                                            $set('amount',$latestStock->sales_price);
+                                            $latestStock = Stock::where('item_id',$get('item_id'))->where('outlet_id',$get('../../outlet_id'))->latest('id')->first();
+                                            $set('sales_price',$latestStock->sales_price);
                                             $set('total',$latestStock->sales_price * $get('qty'));
                                         }
                                     }
@@ -129,8 +162,8 @@ class CustomerOrderResource extends Resource
                                             ->send();
                                     }
                                 })->live(),
-                            Forms\Components\TextInput::make('shedule_delivery_id')->hidden(),
-                            Forms\Components\TextInput::make('amount')->readOnly(),
+                            Forms\Components\TextInput::make('schedule_delivery_id')->hidden(),
+                            Forms\Components\TextInput::make('sales_price')->readOnly(),
                             Forms\Components\TextInput::make('total')->readOnly()
                         ])
                     ])

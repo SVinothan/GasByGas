@@ -19,12 +19,12 @@ return new class extends Migration
             $table->integer('outlet_id')->nullable();
             $table->integer('customer_id')->nullable();
             $table->integer('customer_order_id')->nullable();
-            $table->integer('shedule_delivery_id')->nullable();
+            $table->integer('schedule_delivery_id')->nullable();
             $table->integer('order_date')->nullable();
             $table->integer('qty')->nullable();
             $table->integer('item_id')->nullable();
             $table->integer('stock_id')->nullable();
-            $table->decimal('amount',13,2)->default('0.00');
+            $table->decimal('sales_price',13,2)->default('0.00');
             $table->decimal('total',13,2)->default('0.00');
             $table->integer('user_id')->nullable();
             $table->timestamps();
