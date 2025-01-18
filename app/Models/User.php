@@ -57,4 +57,9 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->belongsTo(Customer::class,'customer_id');
     }
+
+    public function userEmployee()
+    {
+        return $this->belongsTo(Employee::class,'employee_id');
+    }
 }

@@ -11,4 +11,19 @@ class CustomerInvoice extends Model
 
     protected $guarded = [];
 
+    public function customerInvoiceCity()
+    {
+        return $this->belongsTo(City::class,'city_id');
+    }
+
+    public function customerInvoiceOutlet()
+    {
+        return $this->belongsTo(Outlet::class,'outlet_id');
+    }
+
+    public function customerInvoiceCustomer()
+    {
+        return $this->belongsTo(Customer::class,'customer_id');
+    }
+
 }

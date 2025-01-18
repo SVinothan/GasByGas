@@ -11,9 +11,9 @@ class CustomerOrder extends Model
 
     protected $guarded = [];
 
-    public function customerOrderItems()
+    public function customerOrderItem()
     {
-        return $this->hasMany(CustomerOrderItem::class,'customer_order_id');
+        return $this->hasOne(CustomerOrderItem::class,'customer_order_id');
     }
 
     public function customerOrderCity()

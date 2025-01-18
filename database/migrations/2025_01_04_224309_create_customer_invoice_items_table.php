@@ -23,6 +23,7 @@ return new class extends Migration
             $table->integer('order_date')->nullable();
             $table->integer('item_id')->nullable();
             $table->integer('stock_id')->nullable();
+            $table->integer('schedule_delivery_id')->nullable();
             $table->integer('qty')->nullable();
             $table->decimal('amount',13,2)->default('0.00');
             $table->decimal('total',13,2)->default('0.00');

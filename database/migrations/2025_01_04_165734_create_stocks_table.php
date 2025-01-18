@@ -17,7 +17,7 @@ return new class extends Migration
             $table->integer('district_id')->nullable();
             $table->integer('city_id')->nullable();
             $table->integer('outlet_id')->nullable();
-            $table->integer('sheduled_delivery_id')->nullable();
+            $table->integer('schedule_delivery_id')->nullable();
             $table->integer('qty')->nullable();
             $table->integer('item_id')->nullable();
             $table->date('stock_date')->nullable();
