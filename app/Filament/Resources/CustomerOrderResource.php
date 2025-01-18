@@ -22,6 +22,7 @@ use Filament\Forms\Set;
 use Closure;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Carbon;
+use Filament\Support\Enums\MaxWidth;
 
 class CustomerOrderResource extends Resource
 {
@@ -198,6 +199,28 @@ class CustomerOrderResource extends Resource
             ])
             ->actions([
                 // Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('changeStatus')->label('')->icon('heroicon-o-arrow-path')->toolTip('Cancel Order')
+                    ->form([
+                        Forms\Components\Select::make('status')->native(false)
+                            ->options([
+                                'Canceled'=>'Canceled',
+                            ]),
+                    ])
+                    ->action(function (CustomerOrder $record, array $data)
+                    {
+                        
+                        $invoiceItem = CustomerOederItem::where('customer_order_id',$record->id)->update(['status'=>'Canceled']);
+                        $record->status = $data['status'];
+                        $record->update();
+
+                        Notification::make()
+                            ->warning()
+                            ->title('Warning!!')
+                            ->body('The Order has been canceled successfully.')
+                            ->send();
+
+                    })
+                    ->modalWidth(MaxWidth::Small),  
             ])
             ->bulkActions([
                 // Tables\Actions\BulkActionGroup::make([
