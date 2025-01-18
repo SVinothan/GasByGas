@@ -71,6 +71,11 @@ class CreateCustomerInvoice extends CreateRecord
         $invoiceItem->user_id = auth()->user()->id;
         $invoiceItem->save();
 
+        $order->status = 'Finished';
+        $order->update();
+
+        CstomerOrderItem::where('customer_order_id',$order->id)->update(['status'=>'Finished']);
+        
         return $invoice;
     }
 
