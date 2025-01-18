@@ -24,6 +24,7 @@ return new class extends Migration
             $table->integer('qty')->nullable();
             $table->integer('item_id')->nullable();
             $table->integer('stock_id')->nullable();
+            $table->varchar('status')->nullable();
             $table->decimal('sales_price',13,2)->default('0.00');
             $table->decimal('total',13,2)->default('0.00');
             $table->integer('user_id')->nullable();
