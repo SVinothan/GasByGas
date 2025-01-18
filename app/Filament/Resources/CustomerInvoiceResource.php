@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CustomerInvoiceResource\Pages;
 use App\Filament\Resources\CustomerInvoiceResource\RelationManagers;
 use App\Models\CustomerInvoice;
+use App\Models\CustomerInvoiceItem;
 use App\Models\CustomerOrder;
 use App\Models\ScheduleDelivery;
 use App\Models\Stock;
@@ -19,6 +20,8 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Closure;
+use Filament\Support\Enums\MaxWidth;
+use Filament\Notifications\Notification;
 
 class CustomerInvoiceResource extends Resource
 {
@@ -171,17 +174,56 @@ class CustomerInvoiceResource extends Resource
             ->actions([
                 // Tables\Actions\EditAction::make(),
                 Tables\Actions\Action::make('changeStatus')->label('')->icon('heroicon-o-arrow-path')->toolTip('Deliver Stock')
-                ->form([
-                    Forms\Components\Select::make('status')->native(false)
-                        ->options([
-                            'Delivered'=>'Delivered',
-                        ]),
-                ])
-                ->action(function (CustomerInvoice $record, array $data)
-                {
-                    $record->status = $data['status'];
-                    $record->update();
-                })
+                    ->form([
+                        Forms\Components\Select::make('status')->native(false)
+                            ->options([
+                                'Delivered'=>'Delivered',
+                            ]),
+                    ])
+                    ->action(function (CustomerInvoice $record, array $data)
+                    {
+                        
+                        $invoiceItem = CustomerInvoiceItem::where('customer_invoice_id',$record->id)->first();
+                        if($invoiceItem->schedule_delivery_id != null)
+                        {
+                            $stock = Stock::where('schedule_delivery_id',$invoiceItem->schedule_delivery_id)->where('item_id',$invoiceItem->item_id)->first();
+                            if($stock == null)
+                            {
+                                Notification::make()
+                                    ->warning()
+                                    ->title('Warning')
+                                    ->body('The Scheduled stock is not delivered yet. Please try again later.')
+                                    ->send();
+                                return;
+                            }
+                            else
+                            {
+                                $stock->qty = $stock->qty - $invoiceItem->qty;
+                                $stock->status = $data['status'];
+                                $stock->update();
+                                $invoiceItem->stock_id = $stock->id;
+                                $invoiceItem->update();
+                            }
+                        }
+                        else
+                        {
+                            $stock = Stock::find($invoiceItem->stock_id);
+                            $stock->qty = $stock->qty - $invoiceItem->qty;
+                            $stock->status = $data['status'];
+                            $stock->update();
+                        }
+
+                        $record->status = $data['status'];
+                        $record->update();
+
+                        Notification::make()
+                            ->success()
+                            ->title('Succcess')
+                            ->body('The Invoice item has been delivered to customer successfully.')
+                            ->send();
+
+                    })
+                    ->modalWidth(MaxWidth::Small),
             ])
             ->bulkActions([
                 // Tables\Actions\BulkActionGroup::make([
