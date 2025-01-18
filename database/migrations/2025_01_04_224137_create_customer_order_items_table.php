@@ -20,7 +20,7 @@ return new class extends Migration
             $table->integer('customer_id')->nullable();
             $table->integer('customer_order_id')->nullable();
             $table->integer('schedule_delivery_id')->nullable();
-            $table->integer('order_date')->nullable();
+            $table->date('order_date')->nullable();
             $table->integer('qty')->nullable();
             $table->integer('item_id')->nullable();
             $table->integer('stock_id')->nullable();

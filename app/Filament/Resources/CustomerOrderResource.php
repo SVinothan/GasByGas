@@ -54,9 +54,6 @@ class CustomerOrderResource extends Resource
                 Forms\Components\Section::make('')
                 ->description('')
                 ->schema([
-                    Forms\Components\Repeater::make('Items')
-                    ->relationship('customerOrderItems')
-                    ->schema([
                         Forms\Components\Grid::make([
                             'sm'=>1,
                             'md'=>2,
@@ -76,9 +73,9 @@ class CustomerOrderResource extends Resource
                                 ->afterStateUpdated(function (Get $get,Set $set)
                                 {
 
-                                    // dd($get('../../outlet_id'));
-                                    $stock = Stock::where('item_id',$get('item_id'))->where('outlet_id',$get('../../outlet_id'))->sum('qty');
-                                    $stockOrderedQty = CustomerOrderItem::where('item_id',$get('item_id'))->where('outlet_id',$get('../../outlet_id'))->where('schedule_delivery_id',null)->sum('qty');
+                                    // dd($get('outlet_id'));
+                                    $stock = Stock::where('item_id',$get('item_id'))->where('outlet_id',$get('outlet_id'))->sum('qty');
+                                    $stockOrderedQty = CustomerOrderItem::where('item_id',$get('item_id'))->where('outlet_id',$get('outlet_id'))->where('schedule_delivery_id',null)->sum('qty');
                                     if ($get('qty') > '0.00' )
                                     {
                                         if($get('qty') > auth()->user()->userCustomer->cylinder_limit)
@@ -98,14 +95,14 @@ class CustomerOrderResource extends Resource
 
                                         if($get('qty') + $stockOrderedQty > $stock)
                                         {
-                                            $scheduledStock = ScheduleDeliveryStock::where('item_id',$get('item_id'))->where('outlet_id',$get('../../outlet_id'))->whereIn('status',['Scheduled','Confirmed'])->where('scheduled_date','<',Carbon::now()->addDays(14)->format('Y-m-d'))->get();
+                                            $scheduledStock = ScheduleDeliveryStock::where('item_id',$get('item_id'))->where('outlet_id',$get('outlet_id'))->whereIn('status',['Scheduled','Confirmed'])->where('scheduled_date','<',Carbon::now()->addDays(14)->format('Y-m-d'))->get();
                                             // dd($scheduledStock->count());
                                             
                                             if($scheduledStock->count() > 0)
                                             {
                                                 foreach ($scheduledStock as $schedule) 
                                                 {
-                                                    $scheduleOrderedQty = CustomerOrderItem::where('item_id',$get('item_id'))->where('outlet_id',$get('../../outlet_id'))->where('schedule_delivery_id',$schedule->schedule_delivery_id)->sum('qty');
+                                                    $scheduleOrderedQty = CustomerOrderItem::where('item_id',$get('item_id'))->where('outlet_id',$get('outlet_id'))->where('schedule_delivery_id',$schedule->schedule_delivery_id)->sum('qty');
                                                     if($scheduleOrderedQty + $get('qty') <= $schedule->qty)
                                                     {
                                                         $set('sales_price',$schedule->sales_price);
@@ -144,11 +141,11 @@ class CustomerOrderResource extends Resource
                                                 $set('schedule_delivery_id',null);
                                                 return;
                                             }
-                                            // $scheduledStock->sum('qty') < $get('qty') + CustomerOrderStock::where('item_id',$get('item_id'))->where('outlet_id',$get('../../outlet_id'))
+                                            // $scheduledStock->sum('qty') < $get('qty') + CustomerOrderStock::where('item_id',$get('item_id'))->where('outlet_id',$get('outlet_id'))
                                         }
                                         else
                                         {
-                                            $latestStock = Stock::where('item_id',$get('item_id'))->where('outlet_id',$get('../../outlet_id'))->latest('id')->first();
+                                            $latestStock = Stock::where('item_id',$get('item_id'))->where('outlet_id',$get('outlet_id'))->latest('id')->first();
                                             $set('sales_price',$latestStock->sales_price);
                                             $set('total',$latestStock->sales_price * $get('qty'));
                                         }
@@ -167,7 +164,6 @@ class CustomerOrderResource extends Resource
                             Forms\Components\TextInput::make('total')->readOnly()
                         ])
                     ])
-                ])
 
             ]);
     }
@@ -183,13 +179,8 @@ class CustomerOrderResource extends Resource
                 Tables\Columns\TextColumn::make('customerOrderOutlet.outlet_name')
                     ->label('Outlet Name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('customerOrderCustomer.fist_name')
-                    ->label('First Name')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('customerOrderCustomer.last_name')
-                    ->label('Last Name')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('qty')
+                Tables\Columns\TextColumn::make('customerOrderCustomer.full_name')
+                    ->label('Customer Name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('status')
                     ->searchable(),
@@ -214,7 +205,8 @@ class CustomerOrderResource extends Resource
                 //     Tables\Actions\ForceDeleteBulkAction::make(),
                 //     Tables\Actions\RestoreBulkAction::make(),
                 // ]),
-            ]);
+            ])
+            ->recordUrl(null);
     }
 
     public static function getRelations(): array

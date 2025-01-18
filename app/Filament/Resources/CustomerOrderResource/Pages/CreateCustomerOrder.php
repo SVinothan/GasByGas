@@ -13,6 +13,7 @@ use App\Models\ScheduleDeliveryStock;
 use App\Models\Item;
 use App\Models\Outlet;
 use App\Models\Stock;
+use Illuminate\Support\Carbon;
 
 class CreateCustomerOrder extends CreateRecord
 {
@@ -22,55 +23,38 @@ class CreateCustomerOrder extends CreateRecord
     protected function handleRecordCreation(array $data): Model
     {
         #check customer limit
-        $qty = 0;
-        foreach ($data['Items'] as $item)
-        {
-            $qty += $item['qty'];
-        }
-        if($qty > auth()->user()->userCustomer->cylinder_limit)
+        if($data['qty'] > auth()->user()->userCustomer->cylinder_limit)
         {
             Notification::make()
                 ->warning()
                 ->title('Warning!!')
                 ->body('The ordered quantity is exceeding your limit. Please check.')
                 ->send();
-
             $this->halt();
         }
 
         #check stock is available or not
         $schedule_delivery_id = null;
-        foreach ($data['Items'] as $item)
-        {
-            $stock = Stock::where('item_id',$item['item_id'])->where('outlet_id',$data['outlet_id'])->sum('qty');
-            $stockOrderedQty = CustomerOrderItem::where('item_id',$item['item_id'])->where('outlet_id',$data['outlet_id'])->where('schedule_delivery_id',null)->whereNot('status','Finished')->sum('qty');
 
-            if($item['qty'] + $stockOrderedQty > $stock)
+        $stock = Stock::where('item_id',$data['item_id'])->where('outlet_id',$data['outlet_id'])->sum('qty');
+        $stockOrderedQty = CustomerOrderItem::where('item_id',$data['item_id'])->where('outlet_id',$data['outlet_id'])->where('schedule_delivery_id',null)->where('status','Order Pending')->sum('qty');
+
+        if($data['qty'] + $stockOrderedQty > $stock)
+        {
+            $scheduledStock = ScheduleDeliveryStock::where('item_id',$data['item_id'])->where('outlet_id',$data['outlet_id'])->whereIn('status',['Scheduled','Confirmed'])->where('scheduled_date','<',Carbon::now()->addDays(14)->format('Y-m-d'))->orderBy('scheduled_date','asc')->get();
+            
+            if($scheduledStock->count() > 0)
             {
-                $scheduledStock = ScheduleDeliveryStock::where('item_id',$item['item_id'])->where('outlet_id',$data['outlet_id'])->whereIn('status',['Scheduled','Confirmed'])->where('scheduled_date','<',Carbon::now()->addDays(14)->format('Y-m-d'))->orderBy('scheduled_date','asc')->get();
-                
-                if($scheduledStock->count() > 0)
+                foreach ($scheduledStock as $schedule) 
                 {
-                    foreach ($scheduledStock as $schedule) 
+                    $scheduleOrderedQty = CustomerOrderItem::where('item_id',$data['item_id'])->where('outlet_id',$data['outlet_id'])->where('schedule_delivery_id',$schedule->schedule_delivery_id)->sum('qty');
+                    if($scheduleOrderedQty + $data['qty'] <= $schedule->qty)
                     {
-                        $scheduleOrderedQty = CustomerOrderItem::where('item_id',$item['item_id'])->where('outlet_id',$data['outlet_id'])->where('schedule_delivery_id',$schedule->schedule_delivery_id)->sum('qty');
-                        if($scheduleOrderedQty + $item['qty'] <= $schedule->qty)
-                        {
-                            $schedule_delivery_id = $schedule->schedule_delivery_id;
-                            break;
-                        }
-                    }
-                    if($schedule_delivery_id == null)
-                    {
-                        Notification::make()
-                            ->warning()
-                            ->title('Warning!!')
-                            ->body('There are no stock availabe. Try again later Or contact outlet manager.')
-                            ->send();
-                        return $stock;
+                        $schedule_delivery_id = $schedule->schedule_delivery_id;
+                        break;
                     }
                 }
-                else
+                if($schedule_delivery_id == null)
                 {
                     Notification::make()
                         ->warning()
@@ -79,6 +63,15 @@ class CreateCustomerOrder extends CreateRecord
                         ->send();
                     return $stock;
                 }
+            }
+            else
+            {
+                Notification::make()
+                    ->warning()
+                    ->title('Warning!!')
+                    ->body('There are no stock availabe. Try again later Or contact outlet manager.')
+                    ->send();
+                return $stock;
             }
         }
 
@@ -91,16 +84,15 @@ class CreateCustomerOrder extends CreateRecord
         $order->city_id = $outlet->city_id;
         $order->outlet_id = $data['outlet_id'];
         $order->customer_id = auth()->user()->customer_id;
-        $order->qty = $qty;
+        $order->qty = $data['qty'];
         $order->status = 'Order Pending';
         $order->order_date = Carbon::now()->format('Y-m-d');
         $order->is_recieved_empty = '0';
         $order->user_id = auth()->user()->id;
-        $order->token_no = 'GBG-'.Carbon::now()->format('Ym').'-'.sprintf("%04d",CustomerOrder::whereYear('order_date',Carbon::now()->format('Y')->count()));
+        $order->token_no = 'GBG-'.Carbon::now()->format('Ym').'-'.sprintf("%04d",CustomerOrder::whereYear('order_date',Carbon::now()->format('Y'))->count() + 1);
         $order->save();
 
-        foreach ($data['Items'] as $item)
-        {
+       
             $orderItem = new CustomerOrderItem;
             $orderItem->customer_order_id = $order->id;
             $orderItem->province_id = $order->province_id;
@@ -109,40 +101,42 @@ class CreateCustomerOrder extends CreateRecord
             $orderItem->outlet_id = $order->outlet_id;
             $orderItem->customer_id = auth()->user()->customer_id;
             $orderItem->order_date = Carbon::now()->format('Y-m-d');
-            $orderItem->item_id = $item['item_id'];
+            $orderItem->item_id = $data['item_id'];
 
-            $stock = Stock::where('item_id',$item['item_id'])->where('outlet_id',$data['outlet_id'])->sum('qty');
-            $stockOrderedQty = CustomerOrderItem::where('item_id',$item['item_id'])->where('outlet_id',$data['outlet_id'])->where('schedule_delivery_id',null)->whereNot('status','Finished')->sum('qty');
+            $stock = Stock::where('item_id',$data['item_id'])->where('outlet_id',$data['outlet_id'])->sum('qty');
+            $stockOrderedQty = CustomerOrderItem::where('item_id',$data['item_id'])->where('outlet_id',$data['outlet_id'])->where('schedule_delivery_id',null)->whereNot('status','Finished')->sum('qty');
 
-            if($item['qty'] + $stockOrderedQty > $stock)
+            if($data['qty'] + $stockOrderedQty > $stock)
             {
-                $scheduledStock = ScheduleDeliveryStock::where('item_id',$item['item_id'])->where('outlet_id',$data['outlet_id'])->whereIn('status',['Scheduled','Confirmed'])->where('scheduled_date','<',Carbon::now()->addDays(14)->format('Y-m-d'))->orderBy('scheduled_date','asc')->get();
+                $scheduledStock = ScheduleDeliveryStock::where('item_id',$data['item_id'])->where('outlet_id',$data['outlet_id'])->whereIn('status',['Scheduled','Confirmed'])->where('scheduled_date','<',Carbon::now()->addDays(14)->format('Y-m-d'))->orderBy('scheduled_date','asc')->get();
                 
                 foreach ($scheduledStock as $schedule) 
                 {
-                    $scheduleOrderedQty = CustomerOrderItem::where('item_id',$item['item_id'])->where('outlet_id',$data['outlet_id'])->where('schedule_delivery_id',$schedule->schedule_delivery_id)->sum('qty');
-                    if($scheduleOrderedQty + $item['qty'] <= $schedule->qty)
+                    $scheduleOrderedQty = CustomerOrderItem::where('item_id',$data['item_id'])->where('outlet_id',$data['outlet_id'])->where('schedule_delivery_id',$schedule->schedule_delivery_id)->sum('qty');
+                    if($scheduleOrderedQty + $data['qty'] <= $schedule->qty)
                     {
-                        $orderItem->qty = $item['qty'];
+                        $orderItem->qty = $data['qty'];
                         $orderItem->schedule_delivery_id = $schedule->schedule_delivery_id;
                         $orderItem->sales_price = $schedule->sales_price;
-                        $orderItem->total = $schedule->sales_price * $item['qty'];
+                        $orderItem->total = $schedule->sales_price * $data['qty'];
+                        $order->pickup_date = Carbon::parse($schedule->scheduled_date)->addDays(1)->format('Y-m-d');
                         break;
                     }
                 }
             }
             else
             {
-                $stocks = Stock::where('item_id',$item['item_id'])->where('outlet_id',$data['outlet_id'])->orderBy('id','asc')->get();
+                $stocks = Stock::where('item_id',$data['item_id'])->where('outlet_id',$data['outlet_id'])->orderBy('id','asc')->get();
                 foreach ($stocks as $stock) 
                 {
-                    $orderedStock = CustomerOrderItem::where('item_id',$item['item_id'])->where('outlet_id',$data['outlet_id'])->where('stock_id',$stock->id)->sum('qty');
-                    if($orderedStock + $item['qty'] <= $stock->qty)
+                    $orderedStock = CustomerOrderItem::where('item_id',$data['item_id'])->where('outlet_id',$data['outlet_id'])->where('stock_id',$stock->id)->sum('qty');
+                    if($orderedStock + $data['qty'] <= $stock->qty)
                     {
-                        $orderItem->qty = $item['qty'];
+                        $orderItem->qty = $data['qty'];
                         $orderItem->stock_id = $stock->id;
                         $orderItem->sales_price = $stock->sales_price;
-                        $orderItem->total = $stock->sales_price * $item['qty'];
+                        $orderItem->total = $stock->sales_price * $data['qty'];
+                        $order->pickup_date = Carbon::now()->addDays(1)->format('Y-m-d');
                         break;
                     }
                     else
@@ -151,8 +145,8 @@ class CreateCustomerOrder extends CreateRecord
                         $orderItem->stock_id = $stock->id;
                         $orderItem->sales_price = $stock->sales_price;
                         $orderItem->total = $stock->sales_price * ($stock->qty - $orderedStock);
-                        
-                        $item['qty'] =  $item['qty'] - $orderItem->qty;
+                        $order->pickup_date = Carbon::now()->addDays(1)->format('Y-m-d');
+                        $data['qty'] =  $data['qty'] - $orderItem->qty;
                     }
                 }
             }
@@ -160,9 +154,9 @@ class CreateCustomerOrder extends CreateRecord
             $orderItem->user_id = auth()->user()->id;
             $orderItem->save();
            
-        }
 
-        $order->update(['no_of_items'=>CustomerOrderItem::where('customer_order_id',$order->id)->count()]);
+        $order->no_of_items=CustomerOrderItem::where('customer_order_id',$order->id)->count();
+        $order->update();
         return $order;
     }
 

@@ -38,27 +38,20 @@ class CustomerOrderItemResource extends Resource
                 Tables\Columns\TextColumn::make('customerOrderItemOutlet.outlet_name')
                     ->label('Outlet Name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('customerOrderItemCustomer.fist_name')
-                    ->label('First Name')
+                Tables\Columns\TextColumn::make('customerOrderItemCustomer.full_name')
+                    ->label('Customer Name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('customerOrderItemCustomer.last_name')
-                    ->label('Last Name')
+                Tables\Columns\TextColumn::make('customerOrderItemDetail.name')
+                    ->label('Item Name')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('qty')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('order_date')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('qty')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('customerOrderItemDetail.name')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('amount')
-                    ->numeric()
-                    ->sortable(),
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('sales_price')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('total')
-                    ->numeric()
-                    ->sortable(),
+                    ->searchable(),
                  
             ])
             ->filters([
