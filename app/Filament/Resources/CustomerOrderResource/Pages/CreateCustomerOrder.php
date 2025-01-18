@@ -7,6 +7,12 @@ use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\CustomerOrder;
+use App\Models\CustomerOrderItem;
+use App\Models\ScheduleDeliveryStock;
+use App\Models\Item;
+use App\Models\Outlet;
+use App\Models\Stock;
 
 class CreateCustomerOrder extends CreateRecord
 {
@@ -24,10 +30,10 @@ class CreateCustomerOrder extends CreateRecord
         if($qty > auth()->user()->userCustomer->cylinder_limit)
         {
             Notification::make()
-            ->warning()
-            ->title('Warning!!')
-            ->body('The ordered quantity is exceeding your limit. Please check.')
-            ->send();
+                ->warning()
+                ->title('Warning!!')
+                ->body('The ordered quantity is exceeding your limit. Please check.')
+                ->send();
 
             $this->halt();
         }

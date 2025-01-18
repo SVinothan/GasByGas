@@ -5,6 +5,8 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ScheduleDeliveryResource\Pages;
 use App\Filament\Resources\ScheduleDeliveryResource\RelationManagers;
 use App\Models\ScheduleDelivery;
+use App\Models\ScheduleDeliveryStock;
+use App\Models\Stock;
 use App\Models\Province;
 use App\Models\District;
 use App\Models\City;
@@ -21,6 +23,9 @@ use Filament\Forms\Get;
 use Closure;
 use Filament\Support\Enums\Alignment;
 use Filament\Tables\Columns\Summarizers\Sum;
+use Illuminate\Support\Carbon;
+use Filament\Notifications\Notification;
+use Filament\Support\Enums\MaxWidth;
 
 class ScheduleDeliveryResource extends Resource
 {
@@ -152,7 +157,63 @@ class ScheduleDeliveryResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()->label('')->toolTip('View Schedule Delivery'),
-                Tables\Actions\EditAction::make()->label('')->toolTip('Edit Schedule Delivery'),
+                // Tables\Actions\EditAction::make()->label('')->toolTip('Edit Schedule Delivery'),
+                Tables\Actions\Action::make('changeStatus')->label('')->icon('heroicon-o-arrow-path')
+                    ->form([
+                        Forms\Components\Select::make('status')->native(false)
+                            ->options([
+                                'Canceled'=>'Canceled',
+                                'Confirmed'=>'Confirmed',
+                            ])->hidden(fn (ScheduleDelivery $record):bool=>$record->status == 'Scheduled' ? false : true),
+                        Forms\Components\Select::make('status')->native(false)
+                            ->options([
+                                'Dispatched'=>'Dispatched',
+                            ])->hidden(fn (ScheduleDelivery $record):bool=>$record->status == 'Confirmed' ? false : true),
+                        Forms\Components\Select::make('status')->native(false)
+                            ->options([
+                                'Delivered'=>'Delivered',
+                            ])->hidden(fn (ScheduleDelivery $record):bool=>$record->status == 'Dispatched' ? false : true),
+                    ])
+                    ->action(function (ScheduleDelivery $record, array $data)
+                    {
+                        $record->status = $data['status'];
+                        if($data['status'] == 'Dispatched')
+                        {
+                            $record->dispatched_by = auth()->user()->id;
+                        }
+                        if($data['status'] == 'Delivered')
+                        {
+                            $record->recieved_by = auth()->user()->id;
+                            $record->recieved_date = Carbon::now()->format('Y-m-d');
+                            $deliveryStocks = ScheduleDeliveryStock::where('schedule_delivery_id',$record->id)->get();
+                            foreach ($deliveryStocks as $deliveryStock) 
+                            {
+                                $stock = new Stock;
+                                $stock->province_id = $deliveryStock->province_id;
+                                $stock->district_id = $deliveryStock->district_id;
+                                $stock->city_id = $deliveryStock->city_id;
+                                $stock->outlet_id = $deliveryStock->outlet_id;
+                                $stock->schedule_delivery_id = $deliveryStock->schedule_delivery_id;
+                                $stock->qty = $deliveryStock->qty;
+                                $stock->item_id = $deliveryStock->item_id;
+                                $stock->batch_no = $deliveryStock->batch_no;
+                                $stock->cost_price = $deliveryStock->cost_price;
+                                $stock->sales_price = $deliveryStock->sales_price;
+                                $stock->user_id = auth()->user()->id;
+                                $stock->stock_date = Carbon::now()->format('Y-m-d');
+                                $stock->save();
+                            }
+                        }
+                        $record->update();
+                        ScheduleDeliveryStock::where('schedule_delivery_id',$record->id)->update(['status'=>$data['status']]);
+
+                        Notification::make()
+                            ->warning()
+                            ->title('Warning!!')
+                            ->body('The scheduled delivery status has been updated.')
+                            ->send();
+                    })
+                    ->modalWidth(MaxWidth::Small),
                 Tables\Actions\DeleteAction::make()->label('')->toolTip('Delete Schedule Delivery'),
             ])
             ->bulkActions([
