@@ -177,6 +177,17 @@ class ScheduleDeliveryResource extends Resource
                     ->action(function (ScheduleDelivery $record, array $data)
                     {
                         $record->status = $data['status'];
+                        if($data['status'] == 'Canceled')
+                        {
+                            $orderItems = CustomerOrderItem::where('schedule_delivery_id',$record->id)->get();
+                            foreach ($orderItems as $orderItem) 
+                            {
+                                $orderItem->status = 'Canceled';
+                                $orderItem->update();
+
+                                CustomerOrder::where('id',$orderItem->customer_order_id)->update(['status'=>'Canceled']);
+                            }
+                        }
                         if($data['status'] == 'Dispatched')
                         {
                             $record->dispatched_by = auth()->user()->id;
