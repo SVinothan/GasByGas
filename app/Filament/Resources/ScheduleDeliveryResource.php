@@ -225,7 +225,7 @@ class ScheduleDeliveryResource extends Resource
                             ->send();
                     })
                     ->modalWidth(MaxWidth::Small),
-                Tables\Actions\DeleteAction::make()->label('')->toolTip('Delete Schedule Delivery'),
+                // Tables\Actions\DeleteAction::make()->label('')->toolTip('Delete Schedule Delivery'),
             ])
             ->bulkActions([
                 // Tables\Actions\BulkActionGroup::make([
@@ -233,7 +233,8 @@ class ScheduleDeliveryResource extends Resource
                 //     Tables\Actions\ForceDeleteBulkAction::make(),
                 //     Tables\Actions\RestoreBulkAction::make(),
                 // ]),
-            ]);
+            ])
+            ->recordUrl(null);
     }
 
     public static function getRelations(): array
@@ -248,7 +249,7 @@ class ScheduleDeliveryResource extends Resource
         return [
             'index' => Pages\ListScheduleDeliveries::route('/'),
             'create' => Pages\CreateScheduleDelivery::route('/create'),
-            'edit' => Pages\EditScheduleDelivery::route('/{record}/edit'),
+            // 'edit' => Pages\EditScheduleDelivery::route('/{record}/edit'),
         ];
     }
 
