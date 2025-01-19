@@ -21,6 +21,8 @@ use Filament\Navigation\MenuItem;
 use App\Filament\Pages\Profile\UpdateProfileDetail;
 use App\Filament\Pages\Profile\Registration;
 use App\Filament\Widgets\StatsOverview;
+use App\Filament\Widgets\LatestCustomerOrders;
+use App\Filament\Widgets\LatestScheduleDelivery;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -64,6 +66,8 @@ class AdminPanelProvider extends PanelProvider
                 // Widgets\AccountWidget::class,
                 // Widgets\FilamentInfoWidget::class,
                 StatsOverview::class,
+                LatestCustomerOrders::class,
+                LatestScheduleDelivery::class,
             ])
             ->middleware([
                 EncryptCookies::class,
