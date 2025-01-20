@@ -16,6 +16,16 @@ class CustomerOrder extends Model
         return $this->hasOne(CustomerOrderItem::class,'customer_order_id');
     }
 
+    public function customerOrderProvince()
+    {
+        return $this->belongsTo(Province::class,'province_id');
+    }
+
+    public function customerOrderDistrict()
+    {
+        return $this->belongsTo(District::class,'district_id');
+    }
+
     public function customerOrderCity()
     {
         return $this->belongsTo(City::class,'city_id');

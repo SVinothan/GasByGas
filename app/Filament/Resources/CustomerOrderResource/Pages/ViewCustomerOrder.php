@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Filament\Resources\ScheduleDeliveryResource\Pages;
+namespace App\Filament\Resources\CustomerOrderResource\Pages;
 
-use App\Filament\Resources\ScheduleDeliveryResource;
+use App\Filament\Resources\CustomerOrderResource;
 use Filament\Resources\Pages\Page;
 use Filament\Resources\Pages\Concerns\InteractsWithRecord;
+use App\Models\CustomerOrder;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\Grid;
 use Filament\Infolists\Contracts\HasInfolists;
@@ -12,24 +13,24 @@ use Filament\Infolists\Infolist;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\Tabs;
 use Filament\Infolists\Components\Livewire;
-use App\Livewire\ScheduleDelivery\ViewScheduleDeliveryStockTable;
+use App\Livewire\CustomerOrder\ViewCustomerOrderItemTable;
 
-class ViewScheduleDelivery extends Page
+class ViewCustomerOrder extends Page
 {
     use InteractsWithRecord;
 
-    protected static string $resource = ScheduleDeliveryResource::class;
+    protected static string $resource = CustomerOrderResource::class;
 
-    protected static string $view = 'filament.resources.schedule-delivery-resource.pages.view-schedule-delivery';
+    protected static string $view = 'filament.resources.customer-order-resource.pages.view-customer-order';
 
-
+    
     public function mount(int | string $record): void
     {
         $this->record = $this->resolveRecord($record);
         $data=$record;
     }
    
-    public function scheduleDeliveryInfolist(Infolist $infolist): Infolist
+    public function customerOrderInfolist(Infolist $infolist): Infolist
     {
         $record = $this->record;
         return $infolist
@@ -48,10 +49,10 @@ class ViewScheduleDelivery extends Page
                                     'lg' => 4,
                                 ])
                                 ->schema([
-                                    TextEntry::make('scheduleDeliveryProvince.name_en'),
-                                    TextEntry::make('scheduleDeliveryDistrict.name_en'),
-                                    TextEntry::make('scheduleDeliveryCity.name_en'),
-                                    TextEntry::make('scheduleDeliveryOutlet.outlet_name'),
+                                    TextEntry::make('customerOrderProvince.name_en'),
+                                    TextEntry::make('customerOrderDistrict.name_en'),
+                                    TextEntry::make('customerOrderCity.name_en'),
+                                    TextEntry::make('customerOrderOutlet.outlet_name'),
                                 ]),
                                 Grid::make([
                                     'sm'=>1,
@@ -59,25 +60,20 @@ class ViewScheduleDelivery extends Page
                                     'lg' => 3,
                                 ])
                                 ->schema([
-                                    TextEntry::make('schedule_no'),
-                                    TextEntry::make('date'),
-                                    TextEntry::make('scheduled_date'),
-                                    TextEntry::make('no_of_item'),
+                                    TextEntry::make('token_no'),
+                                    TextEntry::make('order_date'),
+                                    TextEntry::make('pickup_date'),
+                                    TextEntry::make('no_of_items'),
                                     TextEntry::make('no_of_qty'),
-                                    TextEntry::make('amount'),
-                                    TextEntry::make('scheduleDeliveryDispatchedUser.name')->hidden(fn($record):bool=> $record->dispatched_by == null ? true : false),
-                                    TextEntry::make('scheduleDeliveryRecievedUser.name')->hidden(fn($record):bool=> $record->dispatched_by == null ? true : false),
-                                    TextEntry::make('recieved_date')->hidden(fn($record):bool=> $record->dispatched_by == null ? true : false),
                                 ]),
                             ]),
                         ]),
                     Tabs\Tab::make('Delivery Stocks')
                     ->schema([
-                        Livewire::make(ViewScheduleDeliveryStockTable::class,['id'=>$this->record->id])
+                        Livewire::make(ViewCustomerOrderItemTable::class,['id'=>$this->record->id])
                     ]),
                   
                 ])
             ]);
     }
-
 }

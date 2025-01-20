@@ -198,7 +198,7 @@ class CustomerOrderResource extends Resource
                 // Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
-                // Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make()->label('')->toolTip('View Order'),
                 Tables\Actions\Action::make('changeStatus')->label('')->icon('heroicon-o-arrow-path')->toolTip('Cancel Order')
                     ->form([
                         Forms\Components\Select::make('status')->native(false)
@@ -244,7 +244,8 @@ class CustomerOrderResource extends Resource
         return [
             'index' => Pages\ListCustomerOrders::route('/'),
             'create' => Pages\CreateCustomerOrder::route('/create'),
-            'edit' => Pages\EditCustomerOrder::route('/{record}/edit'),
+            // 'edit' => Pages\EditCustomerOrder::route('/{record}/edit'),
+            'view' => Pages\ViewCustomerOrder::route('/{record}/show'),
         ];
     }
 
