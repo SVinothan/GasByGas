@@ -35,4 +35,14 @@ class ScheduleDelivery extends Model
     {
         return $this->belongsTo(Outlet::class,'outlet_id');
     }
+
+    public function scheduleDeliveryDispatchedUser()
+    {
+        return $this->belongsTo(User::class,'dispatched_by');
+    }
+
+    public function scheduleDeliveryRecievedUser()
+    {
+        return $this->belongsTo(User::class,'recieved_by');
+    }
 }

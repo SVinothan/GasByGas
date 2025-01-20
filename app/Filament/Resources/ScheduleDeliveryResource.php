@@ -250,6 +250,7 @@ class ScheduleDeliveryResource extends Resource
             'index' => Pages\ListScheduleDeliveries::route('/'),
             'create' => Pages\CreateScheduleDelivery::route('/create'),
             // 'edit' => Pages\EditScheduleDelivery::route('/{record}/edit'),
+            'view' => Pages\ViewScheduleDelivery::route('/{record}/show'),
         ];
     }
 
