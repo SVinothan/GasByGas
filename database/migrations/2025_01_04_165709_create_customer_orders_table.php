@@ -20,6 +20,7 @@ return new class extends Migration
             $table->integer('customer_id')->nullable();
             $table->integer('no_of_items')->nullable();
             $table->integer('qty')->nullable();
+            $table->decimal('amount',13,2)->default('0.00');
             $table->string('status')->nullable();
             $table->string('token_no')->nullable();
             $table->date('order_date')->nullable();

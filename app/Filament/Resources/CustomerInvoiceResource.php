@@ -172,7 +172,7 @@ class CustomerInvoiceResource extends Resource
                 // Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
-                // Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make()->label('')->toolTip('View Invoice'),
                 Tables\Actions\Action::make('changeStatus')->label('')->icon('heroicon-o-arrow-path')->toolTip('Deliver Stock')
                     ->form([
                         Forms\Components\Select::make('status')->native(false)
@@ -247,6 +247,7 @@ class CustomerInvoiceResource extends Resource
             'index' => Pages\ListCustomerInvoices::route('/'),
             'create' => Pages\CreateCustomerInvoice::route('/create'),
             // 'edit' => Pages\EditCustomerInvoice::route('/{record}/edit'),
+            'view' => Pages\ViewCustomerInvoice::route('/{record}/show'),
         ];
     }
 

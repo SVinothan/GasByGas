@@ -67,7 +67,6 @@ class CreateCustomerInvoice extends CreateRecord
         $invoiceItem->qty = $order->customerOrderItem->qty;
         $invoiceItem->sales_price = $order->customerOrderItem->sales_price;
         $invoiceItem->total = $order->customerOrderItem->sales_price * $order->customerOrderItem->qty;
-        $invoiceItem->total = $invoice->id;
         $invoiceItem->user_id = auth()->user()->id;
         $invoiceItem->save();
 
