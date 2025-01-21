@@ -164,6 +164,7 @@ class ScheduleDeliveryResource extends Resource
                 Tables\Actions\ViewAction::make()->label('')->toolTip('View Schedule Delivery'),
                 // Tables\Actions\EditAction::make()->label('')->toolTip('Edit Schedule Delivery'),
                 Tables\Actions\Action::make('changeStatus')->label('')->icon('heroicon-o-arrow-path')
+                    ->hidden(fn () : bool => auth()->user()->hasPermissionTo('Update_ScheduleDelivery') ? false : true)
                     ->form([
                         Forms\Components\Select::make('status')->native(false)
                             ->options([
@@ -261,10 +262,20 @@ class ScheduleDeliveryResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()
-            ->orderBy('updated_at','desc')
+        if(auth()->user()->getRoleNames()->first() == 'OutletManager')
+        {
+            return parent::getEloquentQuery()
+            ->where('outlet_id',auth()->user()->userEmployee->outlet_id)
             ->withoutGlobalScopes([
                 // SoftDeletingScope::class,
             ]);
+        }
+        else
+        {
+            return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                // SoftDeletingScope::class,
+            ]);
+        }
     }
 }

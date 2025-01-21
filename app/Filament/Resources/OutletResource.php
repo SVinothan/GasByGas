@@ -56,7 +56,7 @@ class OutletResource extends Resource
                         'lg' => 2,
                     ])
                     ->schema([
-                        Forms\Components\TextInput::make('outlet_name')->label('City Name')
+                        Forms\Components\TextInput::make('outlet_name')->label('Outlet Name')
                             ->maxLength(191)->unique(table: Outlet::class, ignoreRecord:true)->rules(['required']),
                         Forms\Components\Textarea::make('address')->rules(['required'])
                     ])
@@ -115,9 +115,20 @@ class OutletResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()
+        if(auth()->user()->getRoleNames()->first() == 'Customer')
+        {
+            return parent::getEloquentQuery()
+            ->where('city_id',auth()->user()->userCustomer->city_id)
             ->withoutGlobalScopes([
                 // SoftDeletingScope::class,
             ]);
+        }
+        else
+        {
+            return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                // SoftDeletingScope::class,
+            ]);
+        }
     }
 }

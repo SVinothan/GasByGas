@@ -147,9 +147,21 @@ class CustomerResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()
+        if(auth()->user()->getRoleNames()->first() == 'OutletManager')
+        {
+            return parent::getEloquentQuery()
+            ->where('city_id',auth()->user()->userEmployee->city_id)
             ->withoutGlobalScopes([
                 // SoftDeletingScope::class,
             ]);
+        }
+        else
+        {
+            return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                // SoftDeletingScope::class,
+            ]);
+        }
+       
     }
 }

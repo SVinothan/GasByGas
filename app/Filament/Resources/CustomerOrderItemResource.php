@@ -90,9 +90,28 @@ class CustomerOrderItemResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()
+        if(auth()->user()->getRoleNames()->first() == 'OutletManager')
+        {
+            return parent::getEloquentQuery()
+            ->where('outlet_id',auth()->user()->userEmployee->outlet_id)
             ->withoutGlobalScopes([
                 // SoftDeletingScope::class,
             ]);
+        }
+        else if(auth()->user()->getRoleNames()->first() == 'Customer')
+        {
+            return parent::getEloquentQuery()
+            ->where('customer_id',auth()->user()->customer_id)
+            ->withoutGlobalScopes([
+                // SoftDeletingScope::class,
+            ]);
+        }
+        else
+        {
+            return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                // SoftDeletingScope::class,
+            ]);
+        }
     }
 }
