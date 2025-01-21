@@ -20,6 +20,11 @@ class ScheduleDeliveryStockResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
     protected static ?string $navigationGroup = 'Item';
 
+    public static function getNavigationSort(): ?int
+    {
+        return 4;
+    }
+
     public static function form(Form $form): Form
     {
         return $form

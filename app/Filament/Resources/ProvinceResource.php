@@ -22,6 +22,11 @@ class ProvinceResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-server';
     protected static ?string $navigationGroup = 'Settings';
 
+    public static function getNavigationSort(): ?int
+    {
+        return 21;
+    }
+
     public static function form(Form $form): Form
     {
         return $form

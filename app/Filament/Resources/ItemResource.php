@@ -22,6 +22,11 @@ class ItemResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-document-plus';
     protected static ?string $navigationGroup = 'Item';
 
+    public static function getNavigationSort(): ?int
+    {
+        return 1;
+    }
+    
     public static function form(Form $form): Form
     {
         return $form

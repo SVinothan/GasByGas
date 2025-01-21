@@ -31,6 +31,11 @@ class CustomerOrderResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-check';
     protected static ?string $navigationGroup = 'Consumer';
 
+    public static function getNavigationSort(): ?int
+    {
+        return 12;
+    }
+
     public static function form(Form $form): Form
     {
         return $form

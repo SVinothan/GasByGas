@@ -23,6 +23,11 @@ class CustomerResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
     protected static ?string $navigationGroup = 'Consumer';
 
+    public static function getNavigationSort(): ?int
+    {
+        return 11;
+    }
+
     public static function form(Form $form): Form
     {
         return $form
