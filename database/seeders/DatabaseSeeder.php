@@ -21,12 +21,12 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'test@example.com',
         // ]);
 
-        \App\Models\User::factory()->create([
-            'name' => 'Administrator',
-            'email' => 'admin@gmail.com',
-            'password' => '$2y$12$Gf2YjItx06rrJyWufikHd.bekB5TUyPDN466h37ruZxIbjaxfRqLm', //12345678
-            'role' => 'SuperAdmin', 
-        ]);
+        // \App\Models\User::factory()->create([
+        //     'name' => 'Administrator',
+        //     'email' => 'admin@gmail.com',
+        //     'password' => '$2y$12$Gf2YjItx06rrJyWufikHd.bekB5TUyPDN466h37ruZxIbjaxfRqLm', //12345678
+        //     'role' => 'SuperAdmin', 
+        // ]);
 
         // DB::table('roles')->insert([
         //     'name' => 'SuperAdmin',
@@ -35,13 +35,20 @@ class DatabaseSeeder extends Seeder
 
        
        
-        $this->call(CitiesTableSeeder::class);
-        $this->call(DistrictsTableSeeder::class);
         $this->call(ProvincesTableSeeder::class);
+        $this->call(DistrictsTableSeeder::class);
+        $this->call(CitiesTableSeeder::class);
+        $this->call(OutletsTableSeeder::class);
+        $this->call(ItemsTableSeeder::class);
         $this->call(RoleSeeder::class);
+        $this->call(PermissionsTableSeeder::class);
+        $this->call(RoleHasPermissionsTableSeeder::class);
+        $this->call(EmployeesTableSeeder::class);
+        $this->call(UsersTableSeeder::class);
+        $this->call(ModelHasRolesTableSeeder::class);
 
-        $user=User::find(1);
-        $user->assignRole('SuperAdmin');
+        // $user=User::find(1);
+        // $user->assignRole('SuperAdmin');
 
     }
 }
