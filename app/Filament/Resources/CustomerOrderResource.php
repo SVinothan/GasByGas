@@ -82,9 +82,10 @@ class CustomerOrderResource extends Resource
                                     // dd($get('outlet_id'));
                                     $stock = Stock::where('item_id',$get('item_id'))->where('outlet_id',$get('outlet_id'))->sum('qty');
                                     $stockOrderedQty = CustomerOrderItem::where('item_id',$get('item_id'))->where('outlet_id',$get('outlet_id'))->where('schedule_delivery_id',null)->sum('qty');
+                                    $customerOrderedQty = CustomerOrderItem::where('customer_id',auth()->user()->customer_id)->where('status','Order Pending')->sum('qty');
                                     if ($get('qty') > '0.00' )
                                     {
-                                        if($get('qty') > auth()->user()->userCustomer->cylinder_limit)
+                                        if($get('qty') + $customerOrderedQty > auth()->user()->userCustomer->cylinder_limit)
                                         {
                                             Notification::make()
                                                 ->warning()

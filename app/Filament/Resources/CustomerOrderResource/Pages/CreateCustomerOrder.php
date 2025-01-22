@@ -23,7 +23,19 @@ class CreateCustomerOrder extends CreateRecord
     protected function handleRecordCreation(array $data): Model
     {
         #check customer limit
-        if($data['qty'] > auth()->user()->userCustomer->cylinder_limit)
+        $customerOrderedQty = CustomerOrderItem::where('customer_id',auth()->user()->customer_id)->where('status','Order Pending')->sum('qty');
+
+        if($customerOrderedQty == auth()->user()->userCustomer->cylinder_limit)
+        {
+            Notification::make()
+                ->warning()
+                ->title('Warning!!')
+                ->body('You have been already reach your cylinder limit. Please check.')
+                ->send();
+            $this->halt();
+        }
+
+        if($data['qty'] +  $customerOrderedQty > auth()->user()->userCustomer->cylinder_limit)
         {
             Notification::make()
                 ->warning()
