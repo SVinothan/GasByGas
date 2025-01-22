@@ -41,7 +41,7 @@ class DeliveryConfirmationMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'delivery-confirmation-mail',
+            view: 'mails.delivery-confirmation-mail',
         );
     }
 
