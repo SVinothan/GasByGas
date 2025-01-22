@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Carbon;
+use Filament\Support\Enums\MaxWidth;
 
 class CustomerResource extends Resource
 {
@@ -62,6 +63,7 @@ class CustomerResource extends Resource
                 // Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make()->label(''),
                 Tables\Actions\Action::make('changeStatus')->label('')->icon('heroicon-o-arrow-path')
                     ->form([
                         Forms\Components\Select::make('status')->native(false)
@@ -117,7 +119,8 @@ class CustomerResource extends Resource
                             ->title('Succcess')
                             ->body('The Customer status has been updated successfully.')
                             ->send();
-                    }),
+                    })
+                    ->modalWidth(MaxWidth::Small),
                 
             ])
             ->bulkActions([
@@ -142,6 +145,7 @@ class CustomerResource extends Resource
             'index' => Pages\ListCustomers::route('/'),
             // 'create' => Pages\CreateCustomer::route('/create'),
             // 'edit' => Pages\EditCustomer::route('/{record}/edit'),
+            'view' => Pages\ViewCustomer::route('/{record}/show'),
         ];
     }
 

@@ -125,7 +125,7 @@ class Registration extends BaseRegister
         $customer->mobile_no = $data['mobile_no'];
         $customer->nic_no = $data['nic_no'];
         $customer->type = $data['type'];
-        $customer->status = 'Deactive';
+        $customer->status = 'Pending';
         $customer->cylinder_limit = '1';
 
         if($data['type'] == 'Industry')
