@@ -215,6 +215,22 @@ class ScheduleDeliveryResource extends Resource
                         }
                         if($data['status'] == 'Dispatched')
                         {
+                            $countinvoices = CustomerInvoice::where('status','Paid')->where('schedule_delivery_id',$record->id)->count();
+                            if($countinvoices > 0)
+                            {
+                                $invoices = CustomerInvoice::where('status','Paid')->where('schedule_delivery_id',$record->id)->get();
+                                foreach ($invoices as $invoice) 
+                                {
+                                    Mail::to($invoice->customerInvoiceCustomer->email)->send(new SendVerifiedMail([
+                                        'title' => 'Scheduled Delivery Has Been Dispatched',
+                                        'sayHello' => 'Dear '.$invoice->customerInvoiceCustomer->full_name,
+                                        'body' => 'The scheduled delivery has been Dispatched. You can collect your cylinders by tomorrow. Do not forget to bring your tokens.
+                                                    If you need any further details, Please contact your outlet manager.'
+                                    ]));
+                                }
+                                
+                            }
+
                             $record->dispatched_by = auth()->user()->id;
                         }
                         if($data['status'] == 'Delivered')

@@ -10,7 +10,7 @@ use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Mail\Mailables\Address;
 
-class DeliveryConfirmationMail extends Mailable
+class DeliveryDispatchedMail extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -30,7 +30,7 @@ class DeliveryConfirmationMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Delivery Confirmation',
+            subject: 'Delivery Dispatched',
             from : new Address('test@gmail.com','Gas By Gas'),
         );
     }
@@ -41,7 +41,7 @@ class DeliveryConfirmationMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'mails.delivery-confirmation-mail',
+            view: 'mails.delivery-dispatched-mail',
         );
     }
 
