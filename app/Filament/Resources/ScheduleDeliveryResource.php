@@ -194,6 +194,25 @@ class ScheduleDeliveryResource extends Resource
                                 CustomerOrder::where('id',$orderItem->customer_order_id)->update(['status'=>'Canceled']);
                             }
                         }
+                        if($data['status'] == 'Confirmed')
+                        {
+                            $countOrders = CustomerOrder::where('status','Order Pending')->where('schedule_delivery_id',$record->id)->count();
+                            if($countOrders > 0)
+                            {
+                                $orders = CustomerOrder::where('status','Order Pending')->where('schedule_delivery_id',$record->id)->get();
+                                foreach ($orders as $order) 
+                                {
+                                    Mail::to($order->customerOrderCustomer->email)->send(new SendVerifiedMail([
+                                        'title' => 'Scheduled Delivery Has Been Verified',
+                                        'sayHello' => 'Dear '.$order->customerOrderCustomer->full_name,
+                                        'body' => 'The scheduled delivery has been confirmed. Please bring your empty cylinders and make payments at you ordered outlet.
+                                                    you will recieve your filled cylinder after '.$record->scheduled_date.' . If you could not return empties or make
+                                                    payments, Please contact your outlet manager and reschedule your order.'
+                                    ]));
+                                }
+                                
+                            }
+                        }
                         if($data['status'] == 'Dispatched')
                         {
                             $record->dispatched_by = auth()->user()->id;

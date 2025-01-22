@@ -157,6 +157,8 @@ class CreateCustomerOrder extends CreateRecord
 
         $order->no_of_items=CustomerOrderItem::where('customer_order_id',$order->id)->count();
         $order->amount = $orderItem->total;
+        $order->stock_id = $orderItem->stock_id;
+        $order->schedule_delivery_id = $orderItem->schedule_delivery_id;
         $order->update();
         return $order;
     }

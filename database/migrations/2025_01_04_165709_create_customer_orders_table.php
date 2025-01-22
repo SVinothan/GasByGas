@@ -18,6 +18,8 @@ return new class extends Migration
             $table->integer('city_id')->nullable();
             $table->integer('outlet_id')->nullable();
             $table->integer('customer_id')->nullable();
+            $table->integer('schedule_delivery_id')->nullable();
+            $table->integer('stock_id')->nullable();
             $table->integer('no_of_items')->nullable();
             $table->integer('qty')->nullable();
             $table->decimal('amount',13,2)->default('0.00');
