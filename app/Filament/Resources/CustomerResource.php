@@ -16,6 +16,8 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Carbon;
 use Filament\Support\Enums\MaxWidth;
+use Mail;
+use App\Mail\SendVerifiedMail;
 
 class CustomerResource extends Resource
 {
@@ -74,6 +76,9 @@ class CustomerResource extends Resource
                     ])
                     ->action(function(Customer $record, array $data)
                     {
+                       
+                        return;
+
                         $record->status = $data['status'];
                         $record->status_by = auth()->user()->id;
                         $record->status_date = Carbon::now()->format('Y-m-d');
@@ -102,6 +107,14 @@ class CustomerResource extends Resource
 
                                 $record->user_table_id = $user->id;
                                 $record->update();
+
+                                Mail::to($record->email)->send(new SendVerifiedMail([
+                                    'title' => 'Your Account Has Been Verified',
+                                    'sayHello' => 'Dear '.$record->full_name,
+                                    'body' => 'Your account has been verified by Administrator. Now you can make orders for cylinder with us. Your maximum limit of cylinder is one.
+                                                If you need more, please contact a outlet manager near you. You can use your email address as user name or email and use your NIC number as password
+                                                to login our system.'
+                                ]));
                             }
                         }
                         else
