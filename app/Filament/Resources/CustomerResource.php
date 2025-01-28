@@ -76,9 +76,6 @@ class CustomerResource extends Resource
                     ])
                     ->action(function(Customer $record, array $data)
                     {
-                       
-                        return;
-
                         $record->status = $data['status'];
                         $record->status_by = auth()->user()->id;
                         $record->status_date = Carbon::now()->format('Y-m-d');

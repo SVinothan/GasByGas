@@ -13,7 +13,7 @@ use Filament\Tables\Actions\AttachAction;
 
 class UserRolesRelationManager extends RelationManager
 {
-    protected static string $relationship = 'userRoles';
+    protected static string $relationship = 'roles';
 
     public function form(Form $form): Form
     {

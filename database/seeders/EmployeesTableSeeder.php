@@ -57,6 +57,25 @@ class EmployeesTableSeeder extends Seeder
                 'updated_at' => '2025-01-21 10:29:03',
                 'deleted_at' => NULL,
             ),
+            2 => 
+            array (
+                'id' => 3,
+                'province_id' => NULL,
+                'district_id' => NULL,
+                'city_id' => NULL,
+                'outlet_id' => NULL,
+                'user_table_id' => 5,
+                'full_name' => 'sabaratnam vino',
+                'address' => 'Kilinochchi',
+                'email' => 'sabaratnamvinothan90@gmail.com',
+                'mobile_no' => 776859221,
+                'nic_no' => '972662196V',
+                'role_id' => 4,
+                'user_id' => 1,
+                'created_at' => '2025-01-28 08:06:42',
+                'updated_at' => '2025-01-28 08:06:42',
+                'deleted_at' => NULL,
+            ),
         ));
         
         
