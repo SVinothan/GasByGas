@@ -6,6 +6,9 @@ use App\Filament\Resources\ScheduleDeliveryResource\Pages;
 use App\Filament\Resources\ScheduleDeliveryResource\RelationManagers;
 use App\Models\ScheduleDelivery;
 use App\Models\ScheduleDeliveryStock;
+use App\Models\CustomerOrder;
+use App\Models\CustomerOrderItem;
+use App\Models\CustomerInvoice;
 use App\Models\Stock;
 use App\Models\Province;
 use App\Models\District;
@@ -260,8 +263,8 @@ class ScheduleDeliveryResource extends Resource
                         ScheduleDeliveryStock::where('schedule_delivery_id',$record->id)->update(['status'=>$data['status']]);
 
                         Notification::make()
-                            ->warning()
-                            ->title('Warning!!')
+                            ->success()
+                            ->title('Success!!')
                             ->body('The scheduled delivery status has been updated.')
                             ->send();
                     })
