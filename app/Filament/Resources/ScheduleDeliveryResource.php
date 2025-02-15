@@ -9,6 +9,7 @@ use App\Models\ScheduleDeliveryStock;
 use App\Models\CustomerOrder;
 use App\Models\CustomerOrderItem;
 use App\Models\CustomerInvoice;
+use App\Models\CustomerInvoiceItem;
 use App\Models\Stock;
 use App\Models\Province;
 use App\Models\District;
@@ -29,6 +30,11 @@ use Filament\Tables\Columns\Summarizers\Sum;
 use Illuminate\Support\Carbon;
 use Filament\Notifications\Notification;
 use Filament\Support\Enums\MaxWidth;
+use Mail;
+use App\Mail\SendVerifiedMail;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Forms\Components\DatePicker;
+use Filament\Tables\Filters\Filter;
 
 class ScheduleDeliveryResource extends Resource
 {
@@ -137,13 +143,16 @@ class ScheduleDeliveryResource extends Resource
                  
                 Tables\Columns\TextColumn::make('scheduleDeliveryDistrict.name_en')
                     ->label('District Name')
-                    ->searchable(),
+                    ->searchable()
+                    ->hidden(fn() : bool=> auth()->user()->getRoleNames()->first() == 'OutletManager' ? true : false),
                 Tables\Columns\TextColumn::make('scheduleDeliveryCity.name_en')
                     ->label('City Name')
-                    ->searchable(),
+                    ->searchable()
+                    ->hidden(fn() : bool=> auth()->user()->getRoleNames()->first() == 'OutletManager' ? true : false),
                 Tables\Columns\TextColumn::make('scheduleDeliveryOutlet.outlet_name')
                     ->label('Outlet Name')
-                    ->searchable(),
+                    ->searchable()
+                    ->hidden(fn() : bool=> auth()->user()->getRoleNames()->first() == 'OutletManager' ? true : false),
                 Tables\Columns\TextColumn::make('schedule_no')
                     ->label('Schedule Code')
                     ->searchable(),
@@ -162,12 +171,53 @@ class ScheduleDeliveryResource extends Resource
             ])
             ->filters([
                 // Tables\Filters\TrashedFilter::make(),
+                Filter::make('invoice_date')
+                        ->form([
+                            DatePicker::make('created_from')->label('Start Date')
+                                ->placeholder(fn ($state): string => 'Dec 18, ' . now()->subYear()->format('Y')),
+                            DatePicker::make('created_until')->label('End Date')
+                                ->placeholder(fn ($state): string => now()->format('M d, Y')),
+                        ])
+                        ->query(function (Builder $query, array $data): Builder {
+                            return $query
+                                ->when(
+                                    $data['created_from'] ?? null,
+                                    fn (Builder $query, $date): Builder => $query->whereDate('scheduled_date', '>=', $date),
+                                )
+                                ->when(
+                                    $data['created_until'] ?? null,
+                                    fn (Builder $query, $date): Builder => $query->whereDate('scheduled_date', '<=', $date),
+                                );
+                        })
+                        ->indicateUsing(function (array $data): array {
+                            $indicators = [];
+                            if ($data['created_from'] ?? null) {
+                                $indicators['created_from'] = 'Order from ' . Carbon::parse($data['created_from'])->toFormattedDateString();
+                            }
+                            if ($data['created_until'] ?? null) {
+                                $indicators['created_until'] = 'Order until ' . Carbon::parse($data['created_until'])->toFormattedDateString();
+                            }
+
+                            return $indicators;
+                        }),
+                SelectFilter::make('status')
+                ->options([
+                    'Scheduled' => 'Scheduled',
+                    'Confirmed' => 'Confirmed',
+                    'Dispatched' => 'Dispatched',
+                    'Delivered' => 'Delivered',
+                    'Canceled' => 'Canceled'
+                ])
+                ->label('Status')
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()->label('')->toolTip('View Schedule Delivery'),
                 // Tables\Actions\EditAction::make()->label('')->toolTip('Edit Schedule Delivery'),
                 Tables\Actions\Action::make('changeStatus')->label('')->icon('heroicon-o-arrow-path')
                     ->hidden(fn () : bool => auth()->user()->hasPermissionTo('Update_ScheduleDelivery') ? false : true)
+                    ->hidden(fn (ScheduleDelivery $record) : bool => auth()->user()->getRoleNames()->first() == 'OutletManager' && 
+                        $record->status == 'Dispatched' ? false : true)
+                    ->visible(fn (ScheduleDelivery $record) : bool => $record->status == 'Canceled'  ||  $record->status == 'Delivered' ? false : true)
                     ->form([
                         Forms\Components\Select::make('status')->native(false)
                             ->options([
@@ -194,7 +244,16 @@ class ScheduleDeliveryResource extends Resource
                                 $orderItem->status = 'Canceled';
                                 $orderItem->update();
 
-                                CustomerOrder::where('id',$orderItem->customer_order_id)->update(['status'=>'Canceled']);
+                                $order = CustomerOrder::find($orderItem->customer_order_id);
+                                $order->status = 'Canceled';
+                                $order->update();
+
+                                Mail::to($order->customerOrderCustomer->email)->send(new SendVerifiedMail([
+                                    'title' => 'Scheduled Delivery Has Been Canceled',
+                                    'sayHello' => 'Dear '.$order->customerOrderCustomer->full_name,
+                                    'body' => 'We regret to inform you that your order has been Canceled. We sincerely apologize for any inconvenience this may cause.
+                                                If you have any questions or need further assistance, please feel free to contact your outlet manager and reschedule your order.'
+                                ]));
                             }
                         }
                         if($data['status'] == 'Confirmed')
@@ -218,15 +277,15 @@ class ScheduleDeliveryResource extends Resource
                         }
                         if($data['status'] == 'Dispatched')
                         {
-                            $countinvoices = CustomerInvoice::where('status','Paid')->where('schedule_delivery_id',$record->id)->count();
+                            $countinvoices = CustomerInvoiceItem::where('schedule_delivery_id',$record->id)->count();
                             if($countinvoices > 0)
                             {
-                                $invoices = CustomerInvoice::where('status','Paid')->where('schedule_delivery_id',$record->id)->get();
+                                $invoices = CustomerInvoiceItem::where('schedule_delivery_id',$record->id)->get();
                                 foreach ($invoices as $invoice) 
                                 {
-                                    Mail::to($invoice->customerInvoiceCustomer->email)->send(new SendVerifiedMail([
+                                    Mail::to($invoice->customerInvoiceItemCustomer->email)->send(new SendVerifiedMail([
                                         'title' => 'Scheduled Delivery Has Been Dispatched',
-                                        'sayHello' => 'Dear '.$invoice->customerInvoiceCustomer->full_name,
+                                        'sayHello' => 'Dear '.$invoice->customerInvoiceItemCustomer->full_name,
                                         'body' => 'The scheduled delivery has been Dispatched. You can collect your cylinders by tomorrow. Do not forget to bring your tokens.
                                                     If you need any further details, Please contact your outlet manager.'
                                     ]));

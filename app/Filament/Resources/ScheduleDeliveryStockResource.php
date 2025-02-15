@@ -39,17 +39,21 @@ class ScheduleDeliveryStockResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('scheduleDeliveryStockDistrict.name_en')
                     ->label('District Name')
-                    ->searchable(),
+                    ->searchable()
+                    ->hidden(fn() : bool=> auth()->user()->getRoleNames()->first() == 'OutletManager' ? true : false),
                 Tables\Columns\TextColumn::make('scheduleDeliveryStockCity.name_en')
                     ->label('City Name')
-                    ->searchable(),
+                    ->searchable()
+                    ->hidden(fn() : bool=> auth()->user()->getRoleNames()->first() == 'OutletManager' ? true : false),
                 Tables\Columns\TextColumn::make('scheduleDeliveryStockOutlet.outlet_name')
                     ->label('Outlet Name')
-                    ->searchable(),
+                    ->searchable()
+                    ->hidden(fn() : bool=> auth()->user()->getRoleNames()->first() == 'OutletManager' ? true : false),
                 Tables\Columns\TextColumn::make('scheduleDeliveryDetail.schedule_no')
                     ->label('Schedule Code')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('scheduleDeliveryStockItem.name')
+                    ->label('Item')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('batch_no')
                     ->searchable(),

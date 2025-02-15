@@ -31,4 +31,8 @@ class CustomerInvoiceItem extends Model
         return $this->belongsTo(Item::class,'item_id');
     }
 
+    public function customerInvoiceDetail()
+    {
+        return $this->belongsTo(CustomerInvoice::class,'customer_invoice_id');
+    }
 }

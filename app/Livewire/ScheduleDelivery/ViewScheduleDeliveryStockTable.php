@@ -32,13 +32,16 @@ class ViewScheduleDeliveryStockTable extends Component implements HasForms, HasT
 
                 Tables\Columns\TextColumn::make('scheduleDeliveryStockDistrict.name_en')
                     ->label('District Name')
-                    ->searchable(),
+                    ->searchable()
+                    ->hidden(fn() : bool=> auth()->user()->getRoleNames()->first() == 'OutletManager' ? true : false),
                 Tables\Columns\TextColumn::make('scheduleDeliveryStockCity.name_en')
                     ->label('City Name')
-                    ->searchable(),
+                    ->searchable()
+                    ->hidden(fn() : bool=> auth()->user()->getRoleNames()->first() == 'OutletManager' ? true : false),
                 Tables\Columns\TextColumn::make('scheduleDeliveryStockOutlet.outlet_name')
                     ->label('Outlet Name')
-                    ->searchable(),
+                    ->searchable()
+                    ->hidden(fn() : bool=> auth()->user()->getRoleNames()->first() == 'OutletManager' ? true : false),
                 Tables\Columns\TextColumn::make('scheduleDeliveryStockItem.name')
                     ->label('Item Name')
                     ->searchable(),

@@ -30,4 +30,9 @@ class CustomerOrderItem extends Model
     {
         return $this->belongsTo(Item::class,'item_id');
     }
+
+    public function customerOrderDetail()
+    {
+        return $this->belongsTo(CustomerOrder::class,'customer_order_id');
+    }
 }

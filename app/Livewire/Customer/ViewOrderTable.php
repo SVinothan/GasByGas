@@ -30,18 +30,18 @@ class ViewOrderTable extends Component implements HasForms, HasTable
         return $table
             ->query(CustomerOrder::query()->where('customer_id',$this->id))
             ->columns([
-                Tables\Columns\TextColumn::make('customerOrderCity.name_en')
-                    ->label('City Name')
-                    ->searchable(),
+                // Tables\Columns\TextColumn::make('customerOrderCity.name_en')
+                //     ->label('City Name')
+                //     ->searchable(),
                 Tables\Columns\TextColumn::make('customerOrderOutlet.outlet_name')
                     ->label('Outlet Name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('customerOrderCustomer.full_name')
-                    ->label('Customer Name')
+                // Tables\Columns\TextColumn::make('customerOrderCustomer.full_name')
+                //     ->label('Customer Name')
+                //     ->searchable(),
+                Tables\Columns\TextColumn::make('token_no')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('status')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('token_no')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('order_date')
                     ->searchable(),

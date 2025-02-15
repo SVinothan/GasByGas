@@ -26,4 +26,13 @@ class CustomerInvoice extends Model
         return $this->belongsTo(Customer::class,'customer_id');
     }
 
+    public function customerInvoiceProvince()
+    {
+        return $this->belongsTo(Province::class,'province_id');
+    }
+
+    public function customerInvoiceDistrict()
+    {
+        return $this->belongsTo(District::class,'district_id');
+    }
 }

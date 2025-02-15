@@ -32,23 +32,23 @@ class ViewPaymentTable extends Component implements HasForms, HasTable
         return $table
             ->query(CustomerInvoice::query()->where('customer_id',$this->id))
             ->columns([
-                Tables\Columns\TextColumn::make('customerInvoiceCity.name_en')
-                    ->label('City Name')
-                    ->searchable(),
+                // Tables\Columns\TextColumn::make('customerInvoiceCity.name_en')
+                //     ->label('City Name')
+                //     ->searchable(),
                 Tables\Columns\TextColumn::make('customerInvoiceOutlet.outlet_name')
                     ->label('Outlet Name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('customerInvoiceCustomer.full_name')
-                    ->label('Customer Name')
-                    ->searchable(),
+                // Tables\Columns\TextColumn::make('customerInvoiceCustomer.full_name')
+                //     ->label('Customer Name')
+                //     ->searchable(),
                 Tables\Columns\TextColumn::make('token_no')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('total')
                     ->searchable()->alignment(Alignment::End)->summarize(Sum::make()->numeric(decimalPlaces: 2,)->label('Total')),
                 Tables\Columns\TextColumn::make('paid_amount')
-                    ->searchable(),
+                    ->searchable()->alignment(Alignment::End),
                 Tables\Columns\TextColumn::make('balance')
-                    ->searchable(),
+                    ->searchable()->alignment(Alignment::End),
                 
             ])
             ->filters([

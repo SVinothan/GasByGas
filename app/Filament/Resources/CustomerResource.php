@@ -45,13 +45,16 @@ class CustomerResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('customerProvince.name_en')
                     ->label('Province Name')
-                    ->searchable(),
+                    ->searchable()
+                    ->hidden(fn() : bool=> auth()->user()->getRoleNames()->first() == 'OutletManager' ? true : false),
                 Tables\Columns\TextColumn::make('customerDistrict.name_en')
                     ->label('District Name')
-                    ->searchable(),
+                    ->searchable()
+                    ->hidden(fn() : bool=> auth()->user()->getRoleNames()->first() == 'OutletManager' ? true : false),
                 Tables\Columns\TextColumn::make('customerCity.name_en')
-                    ->label('District Name')
-                    ->searchable(),
+                    ->label('City Name')
+                    ->searchable()
+                    ->hidden(fn() : bool=> auth()->user()->getRoleNames()->first() == 'OutletManager' ? true : false),
                 Tables\Columns\TextColumn::make('full_name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')

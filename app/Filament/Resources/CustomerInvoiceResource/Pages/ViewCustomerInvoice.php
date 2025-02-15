@@ -37,7 +37,7 @@ class ViewCustomerInvoice extends Page
             ->schema([
                 Tabs::make('Tabs')
                 ->tabs([
-                    Tabs\Tab::make('Scheduled Delivery')
+                    Tabs\Tab::make('Customer Invoice')
                         ->schema([
                             Section::make('')
                             ->description('')
@@ -48,10 +48,14 @@ class ViewCustomerInvoice extends Page
                                     'lg' => 4,
                                 ])
                                 ->schema([
-                                    TextEntry::make('customerOrderProvince.name_en'),
-                                    TextEntry::make('customerOrderDistrict.name_en'),
-                                    TextEntry::make('customerOrderCity.name_en'),
-                                    TextEntry::make('customerOrderOutlet.outlet_name'),
+                                    TextEntry::make('customerInvoiceProvince.name_en')->label('Province')
+                                        ->hidden(fn() : bool=> auth()->user()->getRoleNames()->first() == 'OutletManager' || auth()->user()->getRoleNames()->first() == 'Customer' ? true : false),
+                                    TextEntry::make('customerInvoiceDistrict.name_en')->label('District')
+                                        ->hidden(fn() : bool=> auth()->user()->getRoleNames()->first() == 'OutletManager' || auth()->user()->getRoleNames()->first() == 'Customer' ? true : false),
+                                    TextEntry::make('customerInvoiceCity.name_en')->label('City')
+                                        ->hidden(fn() : bool=> auth()->user()->getRoleNames()->first() == 'OutletManager' || auth()->user()->getRoleNames()->first() == 'Customer'? true : false),
+                                    TextEntry::make('customerInvoiceOutlet.outlet_name')->label('Outlet')
+                                        ->hidden(fn() : bool=> auth()->user()->getRoleNames()->first() == 'OutletManager' ? true : false),
                                 ]),
                                 Grid::make([
                                     'sm'=>1,
@@ -59,11 +63,14 @@ class ViewCustomerInvoice extends Page
                                     'lg' => 3,
                                 ])
                                 ->schema([
-                                    TextEntry::make('customerOrderCustomer.full_name'),
-                                    TextEntry::make('token_no'),
+                                    TextEntry::make('customerInvoiceCustomer.full_name')->label('Customer')
+                                        ->hidden(fn() : bool=> auth()->user()->getRoleNames()->first() == 'Customer' ? true : false),
+                                    TextEntry::make('customerInvoiceCustomer.mobile_no')->label('Customer Mobile')
+                                        ->hidden(fn() : bool=> auth()->user()->getRoleNames()->first() == 'Customer' ? true : false),
+                                    TextEntry::make('token_no')->label('Token Number'),
                                     TextEntry::make('invoice_date'),
-                                    TextEntry::make('no_of_items'),
-                                    TextEntry::make('no_of_qty'),
+                                    TextEntry::make('no_of_items')->label('Number of Item'),
+                                    TextEntry::make('qty'),
                                     TextEntry::make('status'),
                                     TextEntry::make('total'),
                                     TextEntry::make('paid_amount'),
@@ -71,7 +78,7 @@ class ViewCustomerInvoice extends Page
                                 ]),
                             ]),
                         ]),
-                    Tabs\Tab::make('Delivery Stocks')
+                    Tabs\Tab::make('Invoice Items')
                     ->schema([
                         Livewire::make(ViewCustomerInvoiceItemTable::class,['id'=>$this->record->id])
                     ]),

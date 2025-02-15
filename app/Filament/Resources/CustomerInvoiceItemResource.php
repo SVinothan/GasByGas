@@ -39,19 +39,29 @@ class CustomerInvoiceItemResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('customerInvoiceItemCity.name_en')
                     ->label('City Name')
-                    ->searchable(),
+                    ->searchable()
+                    ->hidden(fn() : bool=> auth()->user()->getRoleNames()->first() == 'OutletManager' || auth()->user()->getRoleNames()->first() == 'Customer' ? true : false),
                 Tables\Columns\TextColumn::make('customerInvoiceItemOutlet.outlet_name')
                     ->label('Outlet Name')
-                    ->searchable(),
+                    ->searchable()
+                    ->hidden(fn() : bool=> auth()->user()->getRoleNames()->first() == 'OutletManager' ? true : false),
                 Tables\Columns\TextColumn::make('customerInvoiceItemCustomer.full_name')
                     ->label('Customer Name')
+                    ->searchable()
+                    ->hidden(fn() : bool=> auth()->user()->getRoleNames()->first() == 'Customer' ? true : false),
+                Tables\Columns\TextColumn::make('customerInvoiceItemCustomer.mobile_no')
+                    ->label('Customer Mobile')
+                    ->searchable()
+                    ->hidden(fn() : bool=> auth()->user()->getRoleNames()->first() == 'Customer' ? true : false),
+                Tables\Columns\TextColumn::make('customerInvoiceDetail.token_no')
+                    ->label('Token')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('customerInvoiceItemDetail.name')
                     ->label('Item Name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('qty')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('sales_price')
+                Tables\Columns\TextColumn::make('amount')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('total')
                     ->searchable(),

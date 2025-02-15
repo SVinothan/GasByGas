@@ -30,15 +30,15 @@ class ViewInvoiceTable extends Component implements HasForms, HasTable
         return $table
             ->query(CustomerInvoice::query()->where('customer_id',$this->id))
             ->columns([
-                Tables\Columns\TextColumn::make('customerInvoiceCity.name_en')
-                    ->label('City Name')
-                    ->searchable(),
+                // Tables\Columns\TextColumn::make('customerInvoiceCity.name_en')
+                //     ->label('City Name')
+                //     ->searchable(),
                 Tables\Columns\TextColumn::make('customerInvoiceOutlet.outlet_name')
                     ->label('Outlet Name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('customerInvoiceCustomer.full_name')
-                    ->label('Customer Name')
-                    ->searchable(),
+                // Tables\Columns\TextColumn::make('customerInvoiceCustomer.full_name')
+                //     ->label('Customer Name')
+                //     ->searchable(),
                 Tables\Columns\TextColumn::make('token_no')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('status')

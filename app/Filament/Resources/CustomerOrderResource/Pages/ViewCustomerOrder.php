@@ -38,7 +38,7 @@ class ViewCustomerOrder extends Page
             ->schema([
                 Tabs::make('Tabs')
                 ->tabs([
-                    Tabs\Tab::make('Scheduled Delivery')
+                    Tabs\Tab::make('Order Details')
                         ->schema([
                             Section::make('')
                             ->description('')
@@ -49,10 +49,18 @@ class ViewCustomerOrder extends Page
                                     'lg' => 4,
                                 ])
                                 ->schema([
-                                    TextEntry::make('customerOrderProvince.name_en'),
-                                    TextEntry::make('customerOrderDistrict.name_en'),
-                                    TextEntry::make('customerOrderCity.name_en'),
-                                    TextEntry::make('customerOrderOutlet.outlet_name'),
+                                    TextEntry::make('customerOrderProvince.name_en')->label('Province')
+                                        ->hidden(fn() : bool=> auth()->user()->getRoleNames()->first() == 'OutletManager' || auth()->user()->getRoleNames()->first() == 'Customer' ? true : false),
+                    
+                                    TextEntry::make('customerOrderDistrict.name_en')->label('District')
+                                        ->hidden(fn() : bool=> auth()->user()->getRoleNames()->first() == 'OutletManager' || auth()->user()->getRoleNames()->first() == 'Customer' ? true : false),
+
+                                    TextEntry::make('customerOrderCity.name_en')->label('City')
+                                        ->hidden(fn() : bool=> auth()->user()->getRoleNames()->first() == 'OutletManager' || auth()->user()->getRoleNames()->first() == 'Customer' ? true : false),
+
+                                    TextEntry::make('customerOrderOutlet.outlet_name')->label('Outlet')
+                                        ->hidden(fn() : bool=> auth()->user()->getRoleNames()->first() == 'OutletManager' ? true : false),
+
                                 ]),
                                 Grid::make([
                                     'sm'=>1,
@@ -60,18 +68,21 @@ class ViewCustomerOrder extends Page
                                     'lg' => 3,
                                 ])
                                 ->schema([
-                                    TextEntry::make('customerOrderCustomer.full_name'),
-                                    TextEntry::make('token_no'),
+                                    TextEntry::make('customerOrderCustomer.full_name')->label('Customer')
+                                        ->hidden(fn() : bool=> auth()->user()->getRoleNames()->first() == 'Customer' ? true : false),
+                                    TextEntry::make('customerOrderCustomer.mobile_no')->label('Customer Mobile')
+                                        ->hidden(fn() : bool=> auth()->user()->getRoleNames()->first() == 'Customer' ? true : false),
+                                    TextEntry::make('token_no')->label('Token Number'),
                                     TextEntry::make('order_date'),
                                     TextEntry::make('pickup_date'),
-                                    TextEntry::make('no_of_items'),
-                                    TextEntry::make('no_of_qty'),
+                                    TextEntry::make('no_of_items')->label('Number of Items'),
+                                    TextEntry::make('qty')->label('Number of Quantity'),
                                     TextEntry::make('status'),
 
                                 ]),
                             ]),
                         ]),
-                    Tabs\Tab::make('Delivery Stocks')
+                    Tabs\Tab::make('Order Items')
                     ->schema([
                         Livewire::make(ViewCustomerOrderItemTable::class,['id'=>$this->record->id])
                     ]),

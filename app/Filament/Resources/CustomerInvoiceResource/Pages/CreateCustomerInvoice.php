@@ -9,7 +9,11 @@ use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\CustomerOrder;
 use App\Models\CustomerInvoice;
+use App\Models\CustomerOrderItem;
 use App\Models\CustomerInvoiceItem;
+use App\Models\Stock;
+use App\Models\ScheduleDelivery;
+use Illuminate\Support\Carbon;
 
 class CreateCustomerInvoice extends CreateRecord
 {
@@ -46,7 +50,7 @@ class CreateCustomerInvoice extends CreateRecord
         $invoice->order_date = $order->order_date;
         $invoice->pickup_date = $order->pickup_date;
         $invoice->invoice_date = Carbon::now()->format('Y-m-d');
-        $invoice->total = $order->total;
+        $invoice->total = $order->amount;
         $invoice->paid_amount = $data['amount'];
         $invoice->balance = $data['balance'];
         $invoice->status = 'Paid';
@@ -65,7 +69,7 @@ class CreateCustomerInvoice extends CreateRecord
         $invoiceItem->stock_id = $order->customerOrderItem->stock_id;
         $invoiceItem->schedule_delivery_id = $order->customerOrderItem->schedule_delivery_id;
         $invoiceItem->qty = $order->customerOrderItem->qty;
-        $invoiceItem->sales_price = $order->customerOrderItem->sales_price;
+        $invoiceItem->amount = $order->customerOrderItem->sales_price;
         $invoiceItem->total = $order->customerOrderItem->sales_price * $order->customerOrderItem->qty;
         $invoiceItem->user_id = auth()->user()->id;
         $invoiceItem->save();
@@ -73,7 +77,7 @@ class CreateCustomerInvoice extends CreateRecord
         $order->status = 'Finished';
         $order->update();
 
-        CstomerOrderItem::where('customer_order_id',$order->id)->update(['status'=>'Finished']);
+        CustomerOrderItem::where('customer_order_id',$order->id)->update(['status'=>'Finished']);
         
         return $invoice;
     }

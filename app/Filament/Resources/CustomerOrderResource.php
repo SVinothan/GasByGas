@@ -23,6 +23,9 @@ use Closure;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Carbon;
 use Filament\Support\Enums\MaxWidth;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Forms\Components\DatePicker;
+use Filament\Tables\Filters\Filter;
 
 class CustomerOrderResource extends Resource
 {
@@ -182,16 +185,23 @@ class CustomerOrderResource extends Resource
                 
                 Tables\Columns\TextColumn::make('customerOrderCity.name_en')
                     ->label('City Name')
-                    ->searchable(),
+                    ->searchable()
+                    ->hidden(fn() : bool=> auth()->user()->getRoleNames()->first() == 'OutletManager' || auth()->user()->getRoleNames()->first() == 'Customer' ? true : false),
                 Tables\Columns\TextColumn::make('customerOrderOutlet.outlet_name')
                     ->label('Outlet Name')
-                    ->searchable(),
+                    ->searchable()
+                    ->hidden(fn() : bool=> auth()->user()->getRoleNames()->first() == 'OutletManager' ? true : false),
                 Tables\Columns\TextColumn::make('customerOrderCustomer.full_name')
                     ->label('Customer Name')
+                    ->searchable()
+                    ->hidden(fn() : bool=> auth()->user()->getRoleNames()->first() == 'Customer' ? true : false),
+                Tables\Columns\TextColumn::make('customerOrderCustomer.mobile_no')
+                    ->label('Customer Mobile')
+                    ->searchable()
+                    ->hidden(fn() : bool=> auth()->user()->getRoleNames()->first() == 'Customer' ? true : false),
+                Tables\Columns\TextColumn::make('token_no')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('status')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('token_no')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('order_date')
                     ->searchable(),
@@ -202,11 +212,48 @@ class CustomerOrderResource extends Resource
             ])
             ->filters([
                 // Tables\Filters\TrashedFilter::make(),
+                Filter::make('invoice_date')
+                        ->form([
+                            DatePicker::make('created_from')->label('Start Date')
+                                ->placeholder(fn ($state): string => 'Dec 18, ' . now()->subYear()->format('Y')),
+                            DatePicker::make('created_until')->label('End Date')
+                                ->placeholder(fn ($state): string => now()->format('M d, Y')),
+                        ])
+                        ->query(function (Builder $query, array $data): Builder {
+                            return $query
+                                ->when(
+                                    $data['created_from'] ?? null,
+                                    fn (Builder $query, $date): Builder => $query->whereDate('order_date', '>=', $date),
+                                )
+                                ->when(
+                                    $data['created_until'] ?? null,
+                                    fn (Builder $query, $date): Builder => $query->whereDate('order_date', '<=', $date),
+                                );
+                        })
+                        ->indicateUsing(function (array $data): array {
+                            $indicators = [];
+                            if ($data['created_from'] ?? null) {
+                                $indicators['created_from'] = 'Order from ' . Carbon::parse($data['created_from'])->toFormattedDateString();
+                            }
+                            if ($data['created_until'] ?? null) {
+                                $indicators['created_until'] = 'Order until ' . Carbon::parse($data['created_until'])->toFormattedDateString();
+                            }
+
+                            return $indicators;
+                        }),
+                SelectFilter::make('status')
+                ->options([
+                    'Order Pending' => 'Order Pending',
+                    'Canceled' => 'Canceled',
+                    'Finished' => 'Finished'
+                ])
+                ->label('Status')
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()->label('')->toolTip('View Order'),
                 Tables\Actions\Action::make('changeStatus')->label('')->icon('heroicon-o-arrow-path')->toolTip('Cancel Order')
                     ->hidden(fn () : bool => auth()->user()->hasPermissionTo('Update_CustomerOrder') ? false : true)
+                    ->visible(fn (CustomerOrder $record) : bool => $record->status == 'Order Pending' ? true : false)
                     ->form([
                         Forms\Components\Select::make('status')->native(false)
                             ->options([

@@ -32,13 +32,19 @@ class ViewCustomerOrderItemTable extends Component implements HasForms, HasTable
             ->columns([
                 Tables\Columns\TextColumn::make('customerOrderItemCity.name_en')
                     ->label('City Name')
-                    ->searchable(),
+                    ->searchable()
+                    ->hidden(fn() : bool=> auth()->user()->getRoleNames()->first() == 'Customer' || auth()->user()->getRoleNames()->first() == 'OutletManager' ? true : false),
+
                 Tables\Columns\TextColumn::make('customerOrderItemOutlet.outlet_name')
                     ->label('Outlet Name')
-                    ->searchable(),
+                    ->searchable()
+                    ->hidden(fn() : bool=> auth()->user()->getRoleNames()->first() == 'OutletManager' ? true : false),
+
                 Tables\Columns\TextColumn::make('customerOrderItemCustomer.full_name')
                     ->label('Customer Name')
-                    ->searchable(),
+                    ->searchable()
+                    ->hidden(fn() : bool=> auth()->user()->getRoleNames()->first() == 'Customer' ? true : false),
+
                 Tables\Columns\TextColumn::make('customerOrderItemDetail.name')
                     ->label('Item Name')
                     ->searchable(),

@@ -39,12 +39,22 @@ class CustomerOrderItemResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('customerOrderItemCity.name_en')
                     ->label('City Name')
-                    ->searchable(),
+                    ->searchable()
+                    ->hidden(fn() : bool=> auth()->user()->getRoleNames()->first() == 'OutletManager' || auth()->user()->getRoleNames()->first() == 'Customer' ? true : false),
                 Tables\Columns\TextColumn::make('customerOrderItemOutlet.outlet_name')
                     ->label('Outlet Name')
-                    ->searchable(),
+                    ->searchable()
+                    ->hidden(fn() : bool=> auth()->user()->getRoleNames()->first() == 'OutletManager' ? true : false),
                 Tables\Columns\TextColumn::make('customerOrderItemCustomer.full_name')
                     ->label('Customer Name')
+                    ->searchable()
+                    ->hidden(fn() : bool=> auth()->user()->getRoleNames()->first() == 'Customer' ? true : false),
+                Tables\Columns\TextColumn::make('customerOrderItemCustomer.mobile_no')
+                    ->label('Customer Mobile')
+                    ->searchable()
+                    ->hidden(fn() : bool=> auth()->user()->getRoleNames()->first() == 'Customer' ? true : false),
+                Tables\Columns\TextColumn::make('customerOrderDetail.token_no')
+                    ->label('Token')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('customerOrderItemDetail.name')
                     ->label('Item Name')

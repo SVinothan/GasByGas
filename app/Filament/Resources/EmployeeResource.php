@@ -49,7 +49,7 @@ class EmployeeResource extends Resource
                         Forms\Components\TextInput::make('full_name')
                             ->maxLength(191)->rules(['required'])->regex('/^[a-zA-Z\s]+$/u'),
                         Forms\Components\Select::make('role_id')->searchable()->rules(['required'])->live()
-                            ->options(Role::whereNot('name','SuperAdmin')->pluck('name','id'))->label('Select Designation'),
+                            ->options(Role::whereNot('name','SuperAdmin')->whereNot('name','Customer')->pluck('name','id'))->label('Select Designation'),
                         Forms\Components\TextInput::make('nic_no')->label('NIC Number')
                             ->minLength(10)->maxLength(12)->unique(table: Employee::class, ignoreRecord:true)->rules(['required']),
                         Forms\Components\TextInput::make('email')

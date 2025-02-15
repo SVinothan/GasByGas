@@ -48,10 +48,15 @@ class ViewScheduleDelivery extends Page
                                     'lg' => 4,
                                 ])
                                 ->schema([
-                                    TextEntry::make('scheduleDeliveryProvince.name_en'),
-                                    TextEntry::make('scheduleDeliveryDistrict.name_en'),
-                                    TextEntry::make('scheduleDeliveryCity.name_en'),
-                                    TextEntry::make('scheduleDeliveryOutlet.outlet_name'),
+                                    TextEntry::make('scheduleDeliveryProvince.name_en')
+                                        ->hidden(fn() : bool=> auth()->user()->getRoleNames()->first() == 'OutletManager' ? true : false),
+                                    TextEntry::make('scheduleDeliveryDistrict.name_en')
+                                        ->hidden(fn() : bool=> auth()->user()->getRoleNames()->first() == 'OutletManager' ? true : false),
+                                    TextEntry::make('scheduleDeliveryCity.name_en')
+                                        ->hidden(fn() : bool=> auth()->user()->getRoleNames()->first() == 'OutletManager' ? true : false),
+                                    TextEntry::make('scheduleDeliveryOutlet.outlet_name')
+                                        ->hidden(fn() : bool=> auth()->user()->getRoleNames()->first() == 'OutletManager' ? true : false),
+
                                 ]),
                                 Grid::make([
                                     'sm'=>1,
@@ -65,8 +70,10 @@ class ViewScheduleDelivery extends Page
                                     TextEntry::make('no_of_item'),
                                     TextEntry::make('no_of_qty'),
                                     TextEntry::make('amount'),
-                                    TextEntry::make('scheduleDeliveryDispatchedUser.name')->hidden(fn($record):bool=> $record->dispatched_by == null ? true : false),
-                                    TextEntry::make('scheduleDeliveryRecievedUser.name')->hidden(fn($record):bool=> $record->dispatched_by == null ? true : false),
+                                    TextEntry::make('scheduleDeliveryDispatchedUser.name')->label('Dispatched By')
+                                        ->hidden(fn($record):bool=> $record->dispatched_by == null ? true : false),
+                                    TextEntry::make('scheduleDeliveryRecievedUser.name')->label('Recieved By')
+                                        ->hidden(fn($record):bool=> $record->dispatched_by == null ? true : false),
                                     TextEntry::make('recieved_date')->hidden(fn($record):bool=> $record->dispatched_by == null ? true : false),
                                 ]),
                             ]),
