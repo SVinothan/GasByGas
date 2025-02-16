@@ -71,7 +71,25 @@ class CustomerResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()->label(''),
-                Tables\Actions\Action::make('changeStatus')->label('')->icon('heroicon-o-arrow-path')
+                Tables\Actions\Action::make('changeLimit')->label('')->icon('heroicon-o-plus')->toolTip('Change Cylinder Limit')->color('warning')
+                    ->form([
+                        Forms\Components\TextInput::make('cylinder_limit')->rules(['required'])
+                            
+                    ])
+                    ->action(function(Customer $record, array $data)
+                    {
+                        $record->cylinder_limit = $data['cylinder_limit'];
+                        $record->user_id = auth()->user()->id;
+                        $record->update();
+
+                        Notification::make()
+                        ->success()
+                        ->title('Success')
+                        ->body('The Customer limit of cylinder has been updated successfully.')
+                        ->send();
+                })
+                ->modalWidth(MaxWidth::Small),
+                Tables\Actions\Action::make('changeStatus')->label('')->icon('heroicon-o-arrow-path')->toolTip('Change Status')
                     ->form([
                         Forms\Components\Select::make('status')->native(false)
                             ->options([

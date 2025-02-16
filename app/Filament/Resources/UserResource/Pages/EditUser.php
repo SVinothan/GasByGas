@@ -11,6 +11,21 @@ class EditUser extends EditRecord
 {
     protected static string $resource = UserResource::class;
 
+
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        if ($data['passwordConfirmation'] !== $data['password'] ) 
+        {
+            Notification::make()
+                ->title('Warning!!')
+                ->body('Please check your confirm password!!')
+                ->warning()
+                ->send();
+            $this->halt();
+        }
+        $data['password'] = bcrypt($data['password']);
+    }
+
     protected function getRedirectUrl(): string
     {
         return $this->previousUrl ?? $this->getResource()::getUrl('index');

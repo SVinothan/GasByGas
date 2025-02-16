@@ -62,12 +62,12 @@ class UserResource extends Resource
                             'lg' => 2,
                         ])
                         ->schema([
-                            TextInput::make('name')->rules(['required']),
-                            TextInput::make('email')->email()->unique(table: User::class),
-                            Select::make('role')
-                                ->options(Role::pluck('name','name'))->rules(['required'])->searchable()->visible($isCreate),
-                            TextInput::make('password')->password()->rules(['required'])->visible($isCreate),
-                            TextInput::make('passwordConfirmation')->password()->same('password')->visible($isCreate),
+                            TextInput::make('name')->rules(['required'])->readOnly(),
+                            TextInput::make('email')->email()->unique(table: User::class, ignoreRecord:true)->readOnly(),
+                            // Select::make('role')
+                            //     ->options(Role::pluck('name','name'))->rules(['required'])->searchable()->visible($isCreate),
+                            TextInput::make('password')->password()->rules(['required'])->minLength(8),
+                            TextInput::make('passwordConfirmation')->password()->same('password'),
                         ])
                     ])->columns(2)
             ]);

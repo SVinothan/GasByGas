@@ -16,6 +16,17 @@ class CreateEmployee extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
+        if(User::where('email',$data['email'])->count() > 0)
+        {
+            Notification::make()
+            ->warning()
+            ->title('Warning')
+            ->body('This employee has been already registered. Please check this again.')
+            ->send();
+            
+            $this->halt();
+        }
+
         $data['user_id'] = auth()->user()->id;
         return $data;
     }

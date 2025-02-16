@@ -19,6 +19,7 @@ use Closure;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\HtmlString;
 use Filament\Notifications\Notification;
+use App\Models\User;
 
 class Registration extends BaseRegister
 {
@@ -115,6 +116,18 @@ class Registration extends BaseRegister
     public function Submit()
     {
         $data = $this->form->getState();
+
+        if(User::where('email',$data['email'])->count() > 0)
+        {
+            Notification::make()
+            ->warning()
+            ->title('Warning')
+            ->body('You have been already registered. Please login to system.')
+            ->send();
+            
+            return redirect(route('filament.admin.auth.login'));
+        }
+
         $customer = new Customer;
         $customer->province_id = $data['province_id'];
         $customer->district_id = $data['district_id'];
