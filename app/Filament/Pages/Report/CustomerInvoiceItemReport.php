@@ -30,6 +30,18 @@ class CustomerInvoiceItemReport extends Page implements HasTable
 
     protected static string $view = 'filament.pages.report.customer-invoice-item-report';
 
+    public static function canAccess(): bool
+    {
+        if(auth()->user()->getRoleNames()->first() == 'Customer' || auth()->user()->getRoleNames()->first() == 'DispatchOfficer')
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+
     public static function table(Table $table): Table
     {
         if(auth()->user()->getRoleNames()->first() == 'OutletManager')
