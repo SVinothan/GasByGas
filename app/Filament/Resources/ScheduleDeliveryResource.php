@@ -215,8 +215,8 @@ class ScheduleDeliveryResource extends Resource
                 // Tables\Actions\EditAction::make()->label('')->toolTip('Edit Schedule Delivery'),
                 Tables\Actions\Action::make('changeStatus')->label('')->icon('heroicon-o-arrow-path')
                     ->hidden(fn () : bool => auth()->user()->hasPermissionTo('Update_ScheduleDelivery') ? false : true)
-                    ->hidden(fn (ScheduleDelivery $record) : bool => auth()->user()->getRoleNames()->first() == 'OutletManager' && 
-                        $record->status == 'Dispatched' ? false : true)
+                    // ->hidden(fn (ScheduleDelivery $record) : bool => $record->status == 'Dispatched' ? auth()->user()->getRoleNames()->first() == 'OutletManager' 
+                    //     ? false : true : true)
                     ->visible(fn (ScheduleDelivery $record) : bool => $record->status == 'Canceled'  ||  $record->status == 'Delivered' ? false : true)
                     ->form([
                         Forms\Components\Select::make('status')->native(false)
@@ -265,7 +265,7 @@ class ScheduleDeliveryResource extends Resource
                                 foreach ($orders as $order) 
                                 {
                                     Mail::to($order->customerOrderCustomer->email)->send(new SendVerifiedMail([
-                                        'title' => 'Scheduled Delivery Has Been Verified',
+                                        'title' => 'Scheduled Delivery Has Been Confirmed',
                                         'sayHello' => 'Dear '.$order->customerOrderCustomer->full_name,
                                         'body' => 'The scheduled delivery has been confirmed. Please bring your empty cylinders and make payments at you ordered outlet.
                                                     you will recieve your filled cylinder after '.$record->scheduled_date.' . If you could not return empties or make

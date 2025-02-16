@@ -35,4 +35,9 @@ class CustomerInvoice extends Model
     {
         return $this->belongsTo(District::class,'district_id');
     }
+
+    public function customerInvoiceScheduleDelivery()
+    {
+        return $this->belongsTo(ScheduleDelivery::class,'schedule_delivery_id');
+    }
 }

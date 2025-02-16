@@ -16,6 +16,11 @@ class CustomerOrderItem extends Model
         return $this->belongsTo(City::class,'city_id');
     }
 
+    public function customerOrderItemDistrict()
+    {
+        return $this->belongsTo(District::class,'district_id');
+    }
+
     public function customerOrderItemOutlet()
     {
         return $this->belongsTo(Outlet::class,'outlet_id');

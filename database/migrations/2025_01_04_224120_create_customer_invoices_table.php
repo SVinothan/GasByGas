@@ -19,9 +19,12 @@ return new class extends Migration
             $table->integer('outlet_id')->nullable();
             $table->integer('customer_id')->nullable();
             $table->integer('customer_order_id')->nullable();
+            $table->integer('schedule_delivery_id')->nullable();
+            $table->integer('stock_id')->nullable();
             $table->integer('no_of_items')->nullable();
             $table->integer('qty')->nullable();
             $table->string('status')->nullable();
+            $table->boolean('is_recieved_empty')->nullable();
             $table->string('token_no')->nullable();
             $table->decimal('total',13,2)->default('0.00');
             $table->decimal('paid_amount',13,2)->default('0.00');

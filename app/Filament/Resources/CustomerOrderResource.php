@@ -170,8 +170,8 @@ class CustomerOrderResource extends Resource
                                     }
                                 })->live(),
                             Forms\Components\TextInput::make('schedule_delivery_id')->hidden(),
-                            Forms\Components\TextInput::make('sales_price')->readOnly(),
-                            Forms\Components\TextInput::make('total')->readOnly()
+                            Forms\Components\TextInput::make('sales_price')->readOnly()->extraInputAttributes(['style'=>'text-align:right']),
+                            Forms\Components\TextInput::make('total')->readOnly()->extraInputAttributes(['style'=>'text-align:right'])
                         ])
                     ])
 

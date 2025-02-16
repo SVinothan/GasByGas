@@ -106,8 +106,8 @@ class CustomerInvoiceResource extends Resource
                             ->options(fn (Get $get) => Item::pluck('name','id'))->disabled(),
                         Forms\Components\TextInput::make('qty')->readOnly()
                             ->extraInputAttributes(['style'=>'text-align:right']),
-                        Forms\Components\TextInput::make('sales_price')->readOnly(),
-                        Forms\Components\TextInput::make('total')->readOnly()
+                        Forms\Components\TextInput::make('sales_price')->readOnly()->extraInputAttributes(['style'=>'text-align:right']),
+                        Forms\Components\TextInput::make('total')->readOnly()->extraInputAttributes(['style'=>'text-align:right'])
                     ])
                 ]),
                 Forms\Components\Section::make('')
@@ -177,6 +177,8 @@ class CustomerInvoiceResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('status')
                     ->searchable(),
+                Tables\Columns\IconColumn::make('is_recieved_empty')
+                    ->searchable()->boolean(),
                 Tables\Columns\TextColumn::make('order_date')
                     ->date()
                     ->sortable(),
@@ -233,6 +235,8 @@ class CustomerInvoiceResource extends Resource
                 Tables\Actions\Action::make('changeStatus')->label('')->icon('heroicon-o-arrow-path')->toolTip('Deliver Stock')
                     ->hidden(fn () : bool => auth()->user()->hasPermissionTo('Update_CustomerInvoice') ? false : true)
                     ->visible(fn (CustomerInvoice $record) : bool => $record->status == 'Delivered' ? false : true)
+                    // ->visible(fn (CustomerInvoice $record) : bool => $record->stock_id != null ? true : false)
+                    // ->visible(fn (CustomerInvoice $record) : bool => $record->customerInvoiceScheduleDelivery->status == 'Delivered' ? true : false)
                     ->form([
                         Forms\Components\Select::make('status')->native(false)
                             ->options([
@@ -271,6 +275,8 @@ class CustomerInvoiceResource extends Resource
                         }
 
                         $record->status = $data['status'];
+                        $record->is_recieved_empty = '1';
+                        $record->stock_id = $invoiceItem->stock_id;
                         $record->update();
 
                         Notification::make()

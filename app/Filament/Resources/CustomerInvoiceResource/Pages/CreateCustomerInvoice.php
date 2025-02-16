@@ -44,6 +44,8 @@ class CreateCustomerInvoice extends CreateRecord
         $invoice->outlet_id = $order->outlet_id;
         $invoice->customer_id = $order->customer_id;
         $invoice->customer_order_id = $order->id;
+        $invoice->schedule_delivery_id = $order->schedule_delivery_id;
+        $invoice->stock_id = $order->stock_id;
         $invoice->token_no = $order->token_no;
         $invoice->no_of_items = $order->no_of_items;
         $invoice->qty = $order->qty;
@@ -53,6 +55,7 @@ class CreateCustomerInvoice extends CreateRecord
         $invoice->total = $order->amount;
         $invoice->paid_amount = $data['amount'];
         $invoice->balance = $data['balance'];
+        $invoice->is_recieved_empty = $data['is_recieved_empty'];
         $invoice->status = 'Paid';
         $invoice->user_id = auth()->user()->id;
         $invoice->save();
